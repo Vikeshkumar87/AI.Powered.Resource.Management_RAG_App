@@ -95,3 +95,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# Node.js / React frontend
+node_modules/
+frontend-react/node_modules/

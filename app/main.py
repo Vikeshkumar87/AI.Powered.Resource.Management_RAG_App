@@ -78,9 +78,19 @@ app.add_middleware(
 )
 
 # Mount static files for frontend
-frontend_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "frontend")
-if os.path.exists(frontend_dir):
-    app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
+# Prefer the built React app (frontend-react/dist), fall back to legacy frontend
+_root = os.path.dirname(os.path.dirname(__file__))
+_react_dist = os.path.join(_root, "frontend-react", "dist")
+_legacy_frontend = os.path.join(_root, "frontend")
+
+if os.path.exists(_react_dist):
+    frontend_dir = _react_dist
+    app.mount("/assets", StaticFiles(directory=os.path.join(_react_dist, "assets")), name="assets")
+elif os.path.exists(_legacy_frontend):
+    frontend_dir = _legacy_frontend
+    app.mount("/static", StaticFiles(directory=_legacy_frontend), name="static")
+else:
+    frontend_dir = None
 
 
 # Include routers
@@ -94,17 +104,18 @@ app.include_router(admin.router, prefix="/api/v1")
 
 @app.get("/", tags=["Root"])
 def root():
-    """Root endpoint - serves the frontend or returns API info."""
-    index_path = os.path.join(frontend_dir, "index.html")
-    if os.path.exists(index_path):
-        return FileResponse(index_path)
+    """Root endpoint - serves the React frontend."""
+    if frontend_dir:
+        index_path = os.path.join(frontend_dir, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
     return {
         "message": "AI-Powered Resource Allocation & Bench Management API",
         "version": settings.app_version,
         "docs": "/docs",
         "redoc": "/redoc",
         "health": "/api/v1/admin/health",
-        "frontend": "Visit /static/index.html for the web UI",
+        "frontend": "Build the React app: cd frontend-react && npm run build",
     }
 
 

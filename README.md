@@ -21,24 +21,33 @@ An intelligent, full-stack application for managing employee resources, project 
 - **Backend**: FastAPI + SQLAlchemy (SQLite by default)
 - **Vector Store**: ChromaDB with sentence-transformers embeddings
 - **RAG Pipeline**: Configurable LLM (OpenAI, Ollama, or Demo mode)
-- **Frontend**: Vanilla HTML/CSS/JavaScript (no build step required)
+- **Frontend**: React 18 + Vite (built and served by FastAPI)
 
 ## Quick Start
 
-### 1. Install Dependencies
+### 1. Install Python Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Configure Environment
+### 2. Build the React Frontend
+
+```bash
+cd frontend-react
+npm install
+npm run build
+cd ..
+```
+
+### 3. Configure Environment
 
 ```bash
 cp .env.example .env
 # Edit .env as needed (see Configuration section below)
 ```
 
-### 3. Start the Server
+### 4. Start the Server
 
 ```bash
 python run.py
@@ -46,17 +55,31 @@ python run.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 4. Seed Sample Data
+### 5. Seed Sample Data
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/admin/seed
 ```
 
-### 5. Open the UI
+### 6. Open the UI
 
-Visit **http://localhost:8000/static/index.html** in your browser.
+Visit **http://localhost:8000** in your browser.
 
 Or visit **http://localhost:8000/docs** for the interactive Swagger API documentation.
+
+### Frontend Development
+
+To run the React frontend in development mode with hot-reload:
+
+```bash
+# Start the FastAPI backend first
+python run.py
+
+# In another terminal, start the Vite dev server
+cd frontend-react
+npm run dev
+# Opens http://localhost:5173 (proxies /api calls to FastAPI on port 8000)
+```
 
 ---
 
