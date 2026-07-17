@@ -2,6 +2,7 @@
 Pydantic schemas for Resource endpoints.
 """
 from pydantic import BaseModel, EmailStr, Field
+from pydantic import ConfigDict
 from typing import List, Optional
 from datetime import datetime
 
@@ -55,8 +56,7 @@ class AllocationSummary(BaseModel):
     start_date: datetime
     end_date: Optional[datetime]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ResourceResponse(ResourceBase):
@@ -65,8 +65,7 @@ class ResourceResponse(ResourceBase):
     updated_at: datetime
     allocations: List[AllocationSummary] = []
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ResourceListResponse(BaseModel):

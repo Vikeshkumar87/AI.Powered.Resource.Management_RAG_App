@@ -2,7 +2,7 @@
 Tests for Allocation API endpoints.
 """
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from fastapi.testclient import TestClient
 
 
@@ -54,8 +54,8 @@ class TestAllocationCRUD:
         resource = create_resource(client)
         project = create_project(client)
 
-        now = datetime.utcnow().isoformat()
-        end = (datetime.utcnow() + timedelta(days=90)).isoformat()
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
+        end = (datetime.now(UTC).replace(tzinfo=None) + timedelta(days=90)).isoformat()
 
         response = client.post("/api/v1/allocations/", json={
             "resource_id": resource["id"],
@@ -77,7 +77,7 @@ class TestAllocationCRUD:
         resource = create_resource(client)
         project = create_project(client)
 
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
         client.post("/api/v1/allocations/", json={
             "resource_id": resource["id"],
             "project_id": project["id"],
@@ -96,7 +96,7 @@ class TestAllocationCRUD:
         project = create_project(client)
         project2 = create_project(client, override={"project_code": "ALLOC_TEST_002"})
 
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
         # First allocation: 80%
         client.post("/api/v1/allocations/", json={
             "resource_id": resource["id"],
@@ -121,7 +121,7 @@ class TestAllocationCRUD:
         resource = create_resource(client)
         project = create_project(client)
 
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
         response = client.post("/api/v1/allocations/", json={
             "resource_id": resource["id"],
             "project_id": project["id"],
@@ -139,7 +139,7 @@ class TestAllocationCRUD:
         resource = create_resource(client)
         project = create_project(client)
 
-        now = datetime.utcnow().isoformat()
+        now = datetime.now(UTC).replace(tzinfo=None).isoformat()
         alloc = client.post("/api/v1/allocations/", json={
             "resource_id": resource["id"],
             "project_id": project["id"],
@@ -162,7 +162,7 @@ class TestAllocationCRUD:
             "project_id": project["id"],
             "role": "Developer",
             "allocation_percentage": 100.0,
-            "start_date": datetime.utcnow().isoformat(),
+            "start_date": datetime.now(UTC).replace(tzinfo=None).isoformat(),
         })
         assert response.status_code == 404
 
@@ -174,6 +174,6 @@ class TestAllocationCRUD:
             "project_id": 99999,
             "role": "Developer",
             "allocation_percentage": 100.0,
-            "start_date": datetime.utcnow().isoformat(),
+            "start_date": datetime.now(UTC).replace(tzinfo=None).isoformat(),
         })
         assert response.status_code == 404

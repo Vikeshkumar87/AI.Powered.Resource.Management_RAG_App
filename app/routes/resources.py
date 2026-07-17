@@ -4,7 +4,7 @@ Resource management API routes.
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
+from datetime import datetime, UTC
 
 from app.database import get_db
 from app.models.resource import Resource
@@ -227,7 +227,7 @@ def release_resource(
     )
     for alloc in active_allocations:
         alloc.is_active = False
-        alloc.end_date = datetime.utcnow()
+        alloc.end_date = datetime.now(UTC).replace(tzinfo=None)
         # Update project team size
         project = db.query(Project).filter(Project.id == alloc.project_id).first()
         if project and project.current_team_size > 0:
@@ -236,7 +236,7 @@ def release_resource(
     # Move resource to bench
     resource.is_on_bench = True
     resource.availability_percentage = 100.0
-    resource.bench_start_date = datetime.utcnow()
+    resource.bench_start_date = datetime.now(UTC).replace(tzinfo=None)
 
     db.commit()
     db.refresh(resource)
