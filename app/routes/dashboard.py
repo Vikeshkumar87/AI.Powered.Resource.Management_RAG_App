@@ -64,7 +64,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
         },
         "departments": departments,
         "top_skills": [{"skill": s, "count": c} for s, c in top_skills],
-        "timestamp": datetime.now(UTC).isoformat(),
+        "timestamp": datetime.now(UTC).replace(tzinfo=None).isoformat(),
     }
 
 
