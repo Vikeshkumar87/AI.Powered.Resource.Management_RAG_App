@@ -1,0 +1,102 @@
+[
+  {
+    "project_id": "PRJ001",
+    "name": "Healthcare AI Platform",
+    "required_skills": ["Python", "Azure", "Machine Learning", "FastAPI"],
+    "domain": "Healthcare",
+    "start_date": "2026-08-01",
+    "duration_months": 6,
+    "resources_needed": 5,
+    "description": "Build an AI-powered patient management system with predictive analytics for early disease detection and resource scheduling."
+  },
+  {
+    "project_id": "PRJ002",
+    "name": "Banking Portal Modernization",
+    "required_skills": ["Java", "AWS", "Microservices", "React"],
+    "domain": "Banking",
+    "start_date": "2026-09-01",
+    "duration_months": 8,
+    "resources_needed": 3,
+    "description": "Modernize legacy core banking portal to cloud-native microservices architecture on AWS, with a new React frontend."
+  },
+  {
+    "project_id": "PRJ003",
+    "name": "E-Commerce Recommendation Engine",
+    "required_skills": ["Python", "TensorFlow", "React", "AWS"],
+    "domain": "Retail",
+    "start_date": "2026-08-15",
+    "duration_months": 4,
+    "resources_needed": 3,
+    "description": "Build a personalized product recommendation engine using deep learning and integrate it into the existing React storefront."
+  },
+  {
+    "project_id": "PRJ004",
+    "name": "DevSecOps Platform Implementation",
+    "required_skills": ["DevOps", "Kubernetes", "Python", "Azure", "Cybersecurity"],
+    "domain": "FinTech",
+    "start_date": "2026-07-25",
+    "duration_months": 3,
+    "resources_needed": 2,
+    "description": "Implement a DevSecOps platform with automated security scanning, compliance checks, and Kubernetes-based deployments on Azure."
+  },
+  {
+    "project_id": "PRJ005",
+    "name": "Insurance Claims GenAI Automation",
+    "required_skills": ["Python", "GenAI", "LangChain", "Azure OpenAI", "FastAPI"],
+    "domain": "Insurance",
+    "start_date": "2026-08-01",
+    "duration_months": 5,
+    "resources_needed": 3,
+    "description": "Automate insurance claims processing using generative AI for document extraction, classification, and approval recommendation."
+  },
+  {
+    "project_id": "PRJ006",
+    "name": "Logistics Real-Time Tracking System",
+    "required_skills": ["Python", "FastAPI", "MongoDB", "Kafka", "Docker"],
+    "domain": "Logistics",
+    "start_date": "2026-09-01",
+    "duration_months": 6,
+    "resources_needed": 4,
+    "description": "Build a real-time shipment tracking system using event-driven architecture with Kafka, FastAPI, and MongoDB for 1M+ daily events."
+  },
+  {
+    "project_id": "PRJ007",
+    "name": "Data Analytics Platform",
+    "required_skills": ["Data Engineering", "PySpark", "AWS", "Python", "Snowflake"],
+    "domain": "Finance",
+    "start_date": "2026-08-20",
+    "duration_months": 7,
+    "resources_needed": 3,
+    "description": "Build a centralized data analytics platform with real-time and batch data processing using PySpark, AWS Glue, and Snowflake."
+  },
+  {
+    "project_id": "PRJ008",
+    "name": "Mobile Banking App",
+    "required_skills": ["Flutter", "Firebase", "Python", "AWS"],
+    "domain": "Banking",
+    "start_date": "2026-10-01",
+    "duration_months": 5,
+    "resources_needed": 2,
+    "description": "Develop a cross-platform mobile banking app with Flutter, real-time notifications via Firebase, and a secure Python backend on AWS."
+  },
+  {
+    "project_id": "PRJ009",
+    "name": "CRM Salesforce Implementation",
+    "required_skills": ["Salesforce", "Apex", "LWC", "Integration"],
+    "domain": "CRM",
+    "start_date": "2026-09-15",
+    "duration_months": 4,
+    "resources_needed": 2,
+    "description": "Full Salesforce CRM implementation including custom Apex development, Lightning Web Components, and ERP system integration."
+  },
+  {
+    "project_id": "PRJ010",
+    "name": "Media Streaming Infrastructure",
+    "required_skills": ["AWS", "GCP", "Terraform", "Python", "Monitoring"],
+    "domain": "Media",
+    "start_date": "2026-08-10",
+    "duration_months": 6,
+    "resources_needed": 2,
+    "description": "Design and implement multi-cloud streaming infrastructure on AWS and GCP to handle 10M+ concurrent users with 99.99% uptime SLA."
+  }
+]
