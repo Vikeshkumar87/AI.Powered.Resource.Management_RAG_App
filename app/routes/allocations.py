@@ -4,8 +4,8 @@ Allocation management API routes.
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import List, Optional
-from datetime import datetime
-from pydantic import BaseModel, Field
+from datetime import datetime, UTC
+from pydantic import BaseModel, Field, ConfigDict
 
 from app.database import get_db
 from app.models.allocation import Allocation
@@ -41,8 +41,7 @@ class AllocationResponse(BaseModel):
     created_by: Optional[str]
     created_at: datetime
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 def _enrich_allocation(alloc: Allocation, db: Session) -> AllocationResponse:
@@ -168,7 +167,7 @@ def delete_allocation(allocation_id: int, db: Session = Depends(get_db)):
     project = db.query(Project).filter(Project.id == allocation.project_id).first()
 
     allocation.is_active = False
-    allocation.end_date = datetime.utcnow()
+    allocation.end_date = datetime.now(UTC).replace(tzinfo=None)
 
     if project and project.current_team_size > 0:
         project.current_team_size -= 1
@@ -188,7 +187,7 @@ def delete_allocation(allocation_id: int, db: Session = Depends(get_db)):
         if not other_allocs:
             resource.is_on_bench = True
             resource.availability_percentage = 100.0
-            resource.bench_start_date = datetime.utcnow()
+            resource.bench_start_date = datetime.now(UTC).replace(tzinfo=None)
         else:
             total_allocated = sum(a.allocation_percentage for a in other_allocs)
             resource.availability_percentage = 100.0 - total_allocated

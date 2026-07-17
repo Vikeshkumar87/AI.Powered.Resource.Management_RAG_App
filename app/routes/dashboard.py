@@ -5,7 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Dict, Any, List, Optional
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 
 from app.database import get_db
 from app.models.resource import Resource
@@ -64,7 +64,7 @@ def get_dashboard_stats(db: Session = Depends(get_db)) -> Dict[str, Any]:
         },
         "departments": departments,
         "top_skills": [{"skill": s, "count": c} for s, c in top_skills],
-        "timestamp": datetime.utcnow().isoformat(),
+        "timestamp": datetime.now(UTC).isoformat(),
     }
 
 
@@ -78,7 +78,7 @@ def get_bench_aging(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
         .all()
     )
 
-    now = datetime.utcnow()
+    now = datetime.now(UTC).replace(tzinfo=None)
     result = []
     for resource in bench_resources:
         days_on_bench = None

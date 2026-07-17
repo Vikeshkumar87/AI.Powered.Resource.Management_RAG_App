@@ -18,7 +18,7 @@ class QueryRequest(BaseModel):
         min_length=5,
         max_length=1000,
         description="Natural language question about resources or projects",
-        example="Who are the Python developers currently on the bench?",
+        json_schema_extra={"example": "Who are the Python developers currently on the bench?"},
     )
     n_context_docs: int = Field(default=5, ge=1, le=20, description="Number of context docs to use")
     filter_type: Optional[str] = Field(
@@ -45,12 +45,12 @@ class RecommendRequest(BaseModel):
         min_length=10,
         max_length=2000,
         description="Natural language description of the project requirements",
-        example="Need a senior backend developer for a 6-month FinTech microservices project",
+        json_schema_extra={"example": "Need a senior backend developer for a 6-month FinTech microservices project"},
     )
     required_skills: List[str] = Field(
         default=[],
         description="List of required skills",
-        example=["Python", "FastAPI", "PostgreSQL", "Docker"],
+        json_schema_extra={"example": ["Python", "FastAPI", "PostgreSQL", "Docker"]},
     )
     team_size: int = Field(default=1, ge=1, le=50, description="Number of resources needed")
     n_candidates: int = Field(default=10, ge=1, le=30, description="Number of candidates to consider")

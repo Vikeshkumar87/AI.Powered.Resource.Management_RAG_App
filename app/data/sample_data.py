@@ -1,13 +1,13 @@
 """
 Sample data for seeding the database.
 """
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from typing import List, Dict, Any
 
 
 def get_sample_resources() -> List[Dict[str, Any]]:
     """Return sample resource/employee data."""
-    now = datetime.utcnow()
+    now = datetime.now(UTC).replace(tzinfo=None)
 
     return [
         {
@@ -278,7 +278,7 @@ def get_sample_resources() -> List[Dict[str, Any]]:
 
 def get_sample_projects() -> List[Dict[str, Any]]:
     """Return sample project data."""
-    now = datetime.utcnow()
+    now = datetime.now(UTC).replace(tzinfo=None)
 
     return [
         {
@@ -397,7 +397,7 @@ def get_sample_allocations(
     project_ids: Dict[str, int],
 ) -> List[Dict[str, Any]]:
     """Return sample allocation data."""
-    now = datetime.utcnow()
+    now = datetime.now(UTC).replace(tzinfo=None)
 
     return [
         {
