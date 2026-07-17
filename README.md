@@ -14,24 +14,43 @@ An intelligent, full-stack application for managing employee resources, project 
 | 💬 **RAG Queries** | Natural language Q&A powered by LLM + vector retrieval |
 | 💡 **AI Recommendations** | Intelligent resource matching for project requirements |
 | 📊 **Analytics Dashboard** | Stats, project gaps, bench aging, department breakdown |
-| 🌐 **Web UI** | Single-page frontend for all features |
+| 🌐 **Web UI** | React frontend (built and served by FastAPI) + legacy HTML/JS frontend |
 
 ## Tech Stack
 
 - **Backend**: FastAPI + SQLAlchemy (SQLite by default)
 - **Vector Store**: ChromaDB with sentence-transformers embeddings
-- **RAG Pipeline**: Configurable LLM (OpenAI, Ollama, or Demo mode)
-- **Frontend**: React 18 + Vite (built and served by FastAPI)
+- **RAG Pipeline**: Configurable LLM (OpenAI, Ollama, or Demo mode — no LangChain dependency)
+- **Frontend (React)**: React 19 + Vite (built into `frontend-react/dist/`, served by FastAPI)
+- **Frontend (Legacy)**: Plain HTML/CSS/JS in `frontend/` (served by FastAPI as fallback)
+
+---
 
 ## Quick Start
 
-### 1. Install Python Dependencies
+### Prerequisites
+
+- **Python 3.10+** — Download from [python.org](https://python.org/downloads/)
+  - ⚠️ Windows: During install, check **"Add Python to PATH"**
+  - ⚠️ Windows: If `python` opens the Microsoft Store, go to **Settings → Apps → Advanced app settings → App execution aliases** and disable the `python.exe` alias
+- **Node.js 18+** — Download from [nodejs.org](https://nodejs.org/)
+
+### Step 1 — Clone & navigate to the repo root
+
+```bash
+# Make sure you're at the REPO ROOT, not a subfolder like \backend
+cd AI.Powered.Resource.Management_RAG_App
+```
+
+### Step 2 — Install Python dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 2. Build the React Frontend
+> **Windows users:** If `pip` is not found, use `py -m pip install -r requirements.txt`
+
+### Step 3 — Build the React frontend
 
 ```bash
 cd frontend-react
@@ -40,14 +59,19 @@ npm run build
 cd ..
 ```
 
-### 3. Configure Environment
+### Step 4 — Configure environment
 
 ```bash
+# macOS / Linux
 cp .env.example .env
-# Edit .env as needed (see Configuration section below)
+
+# Windows PowerShell
+copy .env.example .env
 ```
 
-### 4. Start the Server
+Edit `.env` if needed (the defaults work for demo mode out of the box).
+
+### Step 5 — Start the server
 
 ```bash
 python run.py
@@ -55,30 +79,40 @@ python run.py
 uvicorn app.main:app --reload --port 8000
 ```
 
-### 5. Seed Sample Data
+> **Windows users:** If `python` is not found, use `py run.py`
+
+### Step 6 — Seed sample data
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/admin/seed
 ```
 
-### 6. Open the UI
+Or click **"Seed Sample Data"** in the Dashboard UI.
 
-Visit **http://localhost:8000** in your browser.
+### Step 7 — Open the app
 
-Or visit **http://localhost:8000/docs** for the interactive Swagger API documentation.
+| URL | What |
+|---|---|
+| **http://localhost:8000** | Full web application |
+| **http://localhost:8000/docs** | Interactive Swagger API docs |
+| **http://localhost:8000/redoc** | ReDoc API documentation |
+| **http://localhost:8000/api/v1/admin/health** | System health check |
 
-### Frontend Development
+---
 
-To run the React frontend in development mode with hot-reload:
+## Frontend Development Mode
+
+Run the React frontend with hot-reload alongside the backend:
 
 ```bash
-# Start the FastAPI backend first
+# Terminal 1 — start backend
 python run.py
 
-# In another terminal, start the Vite dev server
+# Terminal 2 — start Vite dev server
 cd frontend-react
 npm run dev
-# Opens http://localhost:5173 (proxies /api calls to FastAPI on port 8000)
+# Opens at http://localhost:5173
+# API calls to /api/* are automatically proxied to http://localhost:8000
 ```
 
 ---
@@ -98,92 +132,94 @@ All settings are controlled via environment variables (`.env` file):
 | `EMBEDDING_MODEL` | `all-MiniLM-L6-v2` | Sentence transformer model for embeddings |
 | `CHROMA_PERSIST_DIR` | `./chroma_db` | ChromaDB storage directory |
 | `PORT` | `8000` | Server port |
-| `LOG_LEVEL` | `INFO` | Logging level |
+| `DEBUG` | `false` | Enable debug/reload mode |
+| `LOG_LEVEL` | `INFO` | Logging verbosity |
 
 ### LLM Provider Modes
 
-- **`demo`** (default): No LLM needed. Returns formatted context from vector search. Great for development/testing.
-- **`openai`**: Uses OpenAI ChatGPT for intelligent analysis. Set `OPENAI_API_KEY`.
-- **`ollama`**: Uses a local Ollama instance. [Install Ollama](https://ollama.ai) and pull a model first.
+- **`demo`** (default): No LLM required. Returns formatted context from vector search. Perfect for development and testing.
+- **`openai`**: Uses OpenAI ChatGPT for intelligent analysis. Set `OPENAI_API_KEY` in `.env`.
+- **`ollama`**: Uses a local Ollama instance. [Install Ollama](https://ollama.ai), then run `ollama pull llama2`.
 
 ---
 
 ## API Reference
 
-### Resources
+### Resources — `/api/v1/resources`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/v1/resources/` | List all resources (with filters) |
-| `POST` | `/api/v1/resources/` | Create a new resource |
-| `GET` | `/api/v1/resources/{id}` | Get resource by ID |
-| `PUT` | `/api/v1/resources/{id}` | Update resource |
-| `DELETE` | `/api/v1/resources/{id}` | Delete resource |
-| `GET` | `/api/v1/resources/bench` | Get bench resources |
-| `POST` | `/api/v1/resources/{id}/allocate` | Allocate to a project |
-| `POST` | `/api/v1/resources/{id}/release` | Release to bench |
+| `GET` | `/` | List all resources (supports filters: `department`, `skill`, `is_on_bench`, `location`, `min_experience`) |
+| `POST` | `/` | Create a new resource/employee |
+| `GET` | `/{id}` | Get resource by ID |
+| `PUT` | `/{id}` | Update resource |
+| `DELETE` | `/{id}` | Delete resource |
+| `GET` | `/bench` | Get bench (unallocated) resources |
+| `POST` | `/{id}/allocate` | Allocate resource to a project |
+| `POST` | `/{id}/release` | Release resource back to bench |
 
-### Projects
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/v1/projects/` | List all projects |
-| `POST` | `/api/v1/projects/` | Create a project |
-| `GET` | `/api/v1/projects/{id}` | Get project details |
-| `PUT` | `/api/v1/projects/{id}` | Update project |
-| `DELETE` | `/api/v1/projects/{id}` | Delete project |
-| `GET` | `/api/v1/projects/{id}/team` | Get allocated team |
-
-### Allocations
+### Projects — `/api/v1/projects`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/v1/allocations/` | List all allocations |
-| `POST` | `/api/v1/allocations/` | Create allocation |
-| `GET` | `/api/v1/allocations/{id}` | Get allocation details |
-| `DELETE` | `/api/v1/allocations/{id}` | End allocation |
+| `GET` | `/` | List all projects (filter by `status`) |
+| `POST` | `/` | Create a project |
+| `GET` | `/{id}` | Get project details |
+| `PUT` | `/{id}` | Update project |
+| `DELETE` | `/{id}` | Delete project |
+| `GET` | `/{id}/team` | Get allocated team for a project |
 
-### RAG / AI
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/v1/rag/query` | Natural language query |
-| `POST` | `/api/v1/rag/recommend` | Resource recommendation |
-| `GET` | `/api/v1/rag/search` | Semantic search |
-
-### Dashboard
+### Allocations — `/api/v1/allocations`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/v1/dashboard/stats` | Overall statistics |
-| `GET` | `/api/v1/dashboard/bench-aging` | Bench aging report |
-| `GET` | `/api/v1/dashboard/project-gaps` | Projects with open positions |
+| `GET` | `/` | List all allocations |
+| `POST` | `/` | Create allocation |
+| `GET` | `/{id}` | Get allocation details |
+| `DELETE` | `/{id}` | End/delete an allocation |
 
-### Admin
+### RAG / AI — `/api/v1/rag`
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/v1/admin/seed` | Seed sample data |
-| `POST` | `/api/v1/admin/reindex` | Rebuild vector index |
-| `GET` | `/api/v1/admin/health` | System health check |
-| `DELETE` | `/api/v1/admin/clear` | Clear all data |
+| `POST` | `/query` | Natural language question (RAG) |
+| `POST` | `/recommend` | AI-powered resource recommendation |
+| `GET` | `/search?q=...` | Semantic search |
+
+### Dashboard — `/api/v1/dashboard`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `GET` | `/stats` | Overall statistics (totals, departments, top skills) |
+| `GET` | `/bench-aging` | Bench resources sorted by days on bench |
+| `GET` | `/project-gaps` | Projects with unfilled positions |
+
+### Admin — `/api/v1/admin`
+
+| Method | Endpoint | Description |
+|---|---|---|
+| `POST` | `/seed` | Seed sample data (15 resources, 6 projects, 6 allocations) |
+| `POST` | `/reindex` | Rebuild ChromaDB vector index |
+| `GET` | `/health` | System health (DB + vector store + LLM config) |
+| `DELETE` | `/clear?confirm=true` | Clear all data from the database |
 
 ---
 
 ## RAG Query Examples
 
-### Natural Language Queries
+### Natural Language Query (curl)
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/rag/query \
   -H "Content-Type: application/json" \
   -d '{
     "question": "Who are the Python developers currently on bench?",
-    "filter_bench": true
+    "filter_bench": true,
+    "n_context_docs": 5
   }'
 ```
 
-### Resource Recommendations
+### Resource Recommendations (curl)
 
 ```bash
 curl -X POST http://localhost:8000/api/v1/rag/recommend \
@@ -195,20 +231,30 @@ curl -X POST http://localhost:8000/api/v1/rag/recommend \
   }'
 ```
 
+### Semantic Search (curl)
+
+```bash
+curl "http://localhost:8000/api/v1/rag/search?q=cloud+architect&bench_only=true&n=5"
+```
+
 ---
 
 ## Running Tests
 
-```bash
-# Install test dependencies (included in requirements.txt)
-pip install pytest pytest-asyncio httpx
+All 39 tests use an in-memory SQLite database — no `.env` file or external services needed.
 
+```bash
 # Run all tests
 python -m pytest tests/ -v
 
-# Run specific test file
+# Run a specific test file
 python -m pytest tests/test_resources.py -v
+python -m pytest tests/test_projects.py -v
+python -m pytest tests/test_allocations.py -v
+python -m pytest tests/test_dashboard.py -v
 ```
+
+> **Windows users:** Use `py -m pytest tests/ -v`
 
 ---
 
@@ -217,39 +263,43 @@ python -m pytest tests/test_resources.py -v
 ```
 .
 ├── app/
-│   ├── main.py              # FastAPI application entry point
-│   ├── config.py            # Settings and configuration
-│   ├── database.py          # Database setup and session management
+│   ├── main.py              # FastAPI app: lifespan, CORS, route registration, static files
+│   ├── config.py            # Pydantic Settings (reads from .env)
+│   ├── database.py          # SQLAlchemy engine, session, Base, create_tables()
 │   ├── models/
-│   │   ├── resource.py      # Resource/Employee SQLAlchemy model
-│   │   ├── project.py       # Project SQLAlchemy model
-│   │   └── allocation.py    # Allocation SQLAlchemy model
+│   │   ├── resource.py      # Resource (employee) SQLAlchemy ORM model
+│   │   ├── project.py       # Project ORM model + ProjectStatus enum
+│   │   └── allocation.py    # Allocation ORM model (resource ↔ project)
 │   ├── routes/
-│   │   ├── resources.py     # Resource CRUD API routes
-│   │   ├── projects.py      # Project CRUD API routes
-│   │   ├── allocations.py   # Allocation API routes
-│   │   ├── rag.py           # RAG query & recommendation routes
-│   │   ├── dashboard.py     # Analytics & dashboard routes
-│   │   ├── admin.py         # Admin routes (seed, reindex, health)
-│   │   └── schemas.py       # Shared Pydantic schemas
+│   │   ├── schemas.py       # Pydantic request/response schemas for Resources
+│   │   ├── resources.py     # Resource CRUD + allocate/release endpoints
+│   │   ├── projects.py      # Project CRUD + team endpoint
+│   │   ├── allocations.py   # Allocation CRUD endpoints
+│   │   ├── rag.py           # RAG query, recommend, and semantic search endpoints
+│   │   ├── dashboard.py     # Stats, bench-aging, project-gaps analytics
+│   │   └── admin.py         # Seed, reindex, health, clear endpoints
 │   ├── services/
-│   │   ├── vector_store.py  # ChromaDB vector store service
-│   │   └── rag_service.py   # RAG pipeline (retrieval + generation)
+│   │   ├── vector_store.py  # ChromaDB + sentence-transformers (lazy init, graceful fallback)
+│   │   └── rag_service.py   # RAG pipeline: retrieval → context → LLM (OpenAI/Ollama/demo)
 │   └── data/
-│       └── sample_data.py   # 15 resources, 6 projects, 6 allocations
-├── frontend/
-│   ├── index.html           # Single-page web application
-│   ├── style.css            # UI styles
-│   └── app.js               # Frontend JavaScript
+│       └── sample_data.py   # 15 sample resources, 6 projects, 6 allocations
+├── frontend-react/          # React 19 + Vite frontend
+│   ├── src/                 # React source components
+│   ├── dist/                # Built output (served by FastAPI at /)
+│   └── package.json
+├── frontend/                # Legacy plain HTML/CSS/JS frontend (fallback)
+│   ├── index.html
+│   ├── style.css
+│   └── app.js
 ├── tests/
-│   ├── conftest.py          # Test fixtures and configuration
-│   ├── test_resources.py    # Resource endpoint tests
-│   ├── test_projects.py     # Project endpoint tests
-│   ├── test_allocations.py  # Allocation endpoint tests
-│   └── test_dashboard.py    # Dashboard endpoint tests
-├── run.py                   # Application runner
-├── requirements.txt         # Python dependencies
-├── .env.example             # Example environment variables
+│   ├── conftest.py          # In-memory SQLite fixtures, TestClient setup
+│   ├── test_resources.py    # 13 resource endpoint tests
+│   ├── test_projects.py     # 9 project endpoint tests
+│   ├── test_allocations.py  # 8 allocation endpoint tests
+│   └── test_dashboard.py    # 9 dashboard/analytics tests
+├── run.py                   # uvicorn entry point (reads host/port from settings)
+├── requirements.txt         # Python dependencies (minimum version pins)
+├── .env.example             # Template for environment configuration
 └── README.md
 ```
 
@@ -257,13 +307,28 @@ python -m pytest tests/test_resources.py -v
 
 ## How RAG Works
 
-1. **Indexing**: When resources and projects are created/updated, they are converted to text documents and embedded using `sentence-transformers` (default: `all-MiniLM-L6-v2`). Embeddings are stored in ChromaDB.
+```
+User Query
+    │
+    ▼
+[1] Embed query using sentence-transformers (all-MiniLM-L6-v2)
+    │
+    ▼
+[2] ChromaDB semantic search → top-N matching resource/project documents
+    │
+    ▼
+[3] Build context string from retrieved documents
+    │
+    ▼
+[4] Send context + question to LLM (OpenAI / Ollama / demo formatter)
+    │
+    ▼
+[5] Return structured answer with sources and relevance scores
+```
 
-2. **Retrieval**: When a user submits a query (e.g., "Python developers on bench"), the query is embedded and semantically similar documents are retrieved from ChromaDB.
-
-3. **Generation**: The retrieved documents form a context window that is sent to the configured LLM (OpenAI/Ollama/Demo) along with the user's question.
-
-4. **Response**: The LLM generates an intelligent, context-aware response explaining which resources match the requirements and why.
+- **Indexing**: Resources and projects are embedded via `to_document_string()` on create/update and stored in ChromaDB. Use `/api/v1/admin/reindex` to rebuild.
+- **Retrieval**: Cosine similarity search returns the most semantically relevant entries.
+- **Generation**: OpenAI or Ollama produces a natural language answer; demo mode formats the raw context.
 
 ---
 
