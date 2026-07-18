@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<<<<<<< HEAD
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,4 +10,213 @@
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
+=======
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resource Management - RAG App</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">
+            <span class="logo">⚡</span>
+            <span class="brand-text">AI Resource Management</span>
+            <span class="badge-rag">RAG Powered</span>
+        </div>
+        <div class="nav-links">
+            <a href="#" class="nav-link active" onclick="showSection('dashboard')">Dashboard</a>
+            <a href="#" class="nav-link" onclick="showSection('resources')">Resources</a>
+            <a href="#" class="nav-link" onclick="showSection('bench')">Bench</a>
+            <a href="#" class="nav-link" onclick="showSection('projects')">Projects</a>
+            <a href="#" class="nav-link" onclick="showSection('ai-query')">AI Query</a>
+            <a href="#" class="nav-link" onclick="showSection('recommendations')">Recommendations</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        <!-- Dashboard Section -->
+        <section id="dashboard" class="section active">
+            <div class="section-header">
+                <h1>📊 Dashboard</h1>
+                <button class="btn btn-primary" onclick="loadDashboard()">Refresh</button>
+            </div>
+            <div id="stats-cards" class="stats-grid">
+                <div class="stat-card loading">Loading...</div>
+            </div>
+            <div class="dashboard-grid">
+                <div class="card">
+                    <h3>🎯 Project Gaps (Open Positions)</h3>
+                    <div id="project-gaps">Loading...</div>
+                </div>
+                <div class="card">
+                    <h3>⏳ Bench Aging Report</h3>
+                    <div id="bench-aging">Loading...</div>
+                </div>
+            </div>
+            <div class="card setup-card" id="setup-banner">
+                <h3>🚀 Quick Setup</h3>
+                <p>Initialize the application with sample data to explore all features.</p>
+                <button class="btn btn-success" onclick="seedDatabase()">Seed Sample Data</button>
+                <span id="seed-status"></span>
+            </div>
+        </section>
+
+        <!-- Resources Section -->
+        <section id="resources" class="section">
+            <div class="section-header">
+                <h1>🧑‍💼 Resources</h1>
+                <div class="header-actions">
+                    <input type="text" id="resource-search" placeholder="Search by skill, dept..." class="search-input">
+                    <button class="btn btn-primary" onclick="loadResources()">Search</button>
+                    <button class="btn btn-outline" onclick="showAddResourceForm()">+ Add Resource</button>
+                </div>
+            </div>
+            <div id="resource-list" class="resource-grid">
+                <p class="empty-state">Loading resources...</p>
+            </div>
+        </section>
+
+        <!-- Bench Section -->
+        <section id="bench" class="section">
+            <div class="section-header">
+                <h1>🪑 Bench Management</h1>
+                <div class="header-actions">
+                    <select id="bench-dept-filter" class="filter-select" onchange="loadBench()">
+                        <option value="">All Departments</option>
+                        <option value="Engineering">Engineering</option>
+                        <option value="Data Science">Data Science</option>
+                        <option value="Frontend">Frontend</option>
+                        <option value="QA">QA</option>
+                        <option value="Security">Security</option>
+                        <option value="Product">Product</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadBench()">Refresh</button>
+                </div>
+            </div>
+            <div id="bench-list" class="resource-grid">
+                <p class="empty-state">Loading bench resources...</p>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="section">
+            <div class="section-header">
+                <h1>📋 Projects</h1>
+                <div class="header-actions">
+                    <select id="project-status-filter" class="filter-select" onchange="loadProjects()">
+                        <option value="">All Status</option>
+                        <option value="planning">Planning</option>
+                        <option value="active">Active</option>
+                        <option value="on_hold">On Hold</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                    <button class="btn btn-primary" onclick="loadProjects()">Refresh</button>
+                </div>
+            </div>
+            <div id="project-list" class="project-grid">
+                <p class="empty-state">Loading projects...</p>
+            </div>
+        </section>
+
+        <!-- AI Query Section -->
+        <section id="ai-query" class="section">
+            <div class="section-header">
+                <h1>🤖 AI-Powered Query (RAG)</h1>
+            </div>
+            <div class="card ai-card">
+                <p class="ai-description">
+                    Ask natural language questions about resources, skills, availability, and projects.
+                    The system uses RAG (Retrieval-Augmented Generation) to find relevant information
+                    and generate intelligent responses.
+                </p>
+                <div class="example-queries">
+                    <strong>Example queries:</strong>
+                    <span class="example-chip" onclick="setQuery(this)">Who are the Python developers on bench?</span>
+                    <span class="example-chip" onclick="setQuery(this)">Find cloud architects with AWS experience</span>
+                    <span class="example-chip" onclick="setQuery(this)">Show resources with 5+ years experience</span>
+                    <span class="example-chip" onclick="setQuery(this)">Which projects need more team members?</span>
+                    <span class="example-chip" onclick="setQuery(this)">Find ML engineers available for a new project</span>
+                </div>
+                <div class="query-form">
+                    <textarea
+                        id="query-input"
+                        placeholder="Ask anything about your resources and projects..."
+                        rows="3"
+                        class="query-textarea"
+                    ></textarea>
+                    <div class="query-options">
+                        <label>
+                            <input type="checkbox" id="bench-only"> Bench resources only
+                        </label>
+                        <select id="filter-type" class="filter-select">
+                            <option value="">All (resources & projects)</option>
+                            <option value="resource">Resources only</option>
+                            <option value="project">Projects only</option>
+                        </select>
+                        <button class="btn btn-primary btn-lg" onclick="runRAGQuery()">
+                            🔍 Ask AI
+                        </button>
+                    </div>
+                </div>
+                <div id="query-result" class="query-result hidden"></div>
+                <div id="query-sources" class="query-sources hidden"></div>
+            </div>
+        </section>
+
+        <!-- Recommendations Section -->
+        <section id="recommendations" class="section">
+            <div class="section-header">
+                <h1>💡 Resource Recommendations</h1>
+            </div>
+            <div class="card ai-card">
+                <p class="ai-description">
+                    Describe your project requirements and get AI-powered recommendations
+                    for the best matching resources from the bench.
+                </p>
+                <div class="recommend-form">
+                    <div class="form-group">
+                        <label>Project Requirements</label>
+                        <textarea
+                            id="project-req"
+                            placeholder="Describe the project: technology stack, domain, duration, team structure..."
+                            rows="4"
+                            class="query-textarea"
+                        >Senior backend developer needed for a 6-month FinTech microservices project using Java, Spring Boot, and Kafka</textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Required Skills (comma-separated)</label>
+                        <input
+                            type="text"
+                            id="required-skills"
+                            placeholder="Python, Docker, AWS, React..."
+                            class="form-input"
+                            value="Java, Spring Boot, Microservices, Kafka"
+                        >
+                    </div>
+                    <div class="form-group">
+                        <label>Team Size Needed</label>
+                        <input type="number" id="team-size" value="2" min="1" max="20" class="form-input-sm">
+                    </div>
+                    <button class="btn btn-primary btn-lg" onclick="getRecommendations()">
+                        🎯 Get Recommendations
+                    </button>
+                </div>
+                <div id="recommendations-result" class="query-result hidden"></div>
+                <div id="recommendations-candidates" class="query-sources hidden"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Resource Detail Modal -->
+    <div id="modal" class="modal hidden">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <script src="/static/app.js"></script>
+</body>
+>>>>>>> 2a1a7caa38d0cbea04ebabb8e7ad1ae87486eaa8
 </html>
