@@ -1,0 +1,182 @@
+[
+  {
+    "allocation_id": "ALLOC001",
+    "employee_id": "EMP001",
+    "project_id": "PRJ001",
+    "start_date": "2025-01-01",
+    "end_date": "2025-06-30",
+    "performance_rating": 4.7,
+    "role": "Senior Python Developer"
+  },
+  {
+    "allocation_id": "ALLOC002",
+    "employee_id": "EMP002",
+    "project_id": "PRJ002",
+    "start_date": "2024-06-01",
+    "end_date": "2025-01-31",
+    "performance_rating": 4.5,
+    "role": "Lead Java Developer"
+  },
+  {
+    "allocation_id": "ALLOC003",
+    "employee_id": "EMP003",
+    "project_id": "PRJ003",
+    "start_date": "2025-02-01",
+    "end_date": "2025-07-31",
+    "performance_rating": 4.3,
+    "role": "Frontend Developer"
+  },
+  {
+    "allocation_id": "ALLOC004",
+    "employee_id": "EMP004",
+    "project_id": "PRJ003",
+    "start_date": "2025-03-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.8,
+    "role": "ML Engineer"
+  },
+  {
+    "allocation_id": "ALLOC005",
+    "employee_id": "EMP005",
+    "project_id": "PRJ004",
+    "start_date": "2024-09-01",
+    "end_date": "2025-03-31",
+    "performance_rating": 4.6,
+    "role": "DevOps Engineer"
+  },
+  {
+    "allocation_id": "ALLOC006",
+    "employee_id": "EMP006",
+    "project_id": "PRJ006",
+    "start_date": "2024-12-01",
+    "end_date": "2026-05-31",
+    "performance_rating": 4.2,
+    "role": "Java Microservices Developer"
+  },
+  {
+    "allocation_id": "ALLOC007",
+    "employee_id": "EMP007",
+    "project_id": "PRJ005",
+    "start_date": "2025-01-15",
+    "end_date": "2025-06-15",
+    "performance_rating": 4.0,
+    "role": "Backend Developer"
+  },
+  {
+    "allocation_id": "ALLOC008",
+    "employee_id": "EMP008",
+    "project_id": "PRJ007",
+    "start_date": "2025-02-01",
+    "end_date": "2026-07-31",
+    "performance_rating": 4.9,
+    "role": "Lead Data Engineer"
+  },
+  {
+    "allocation_id": "ALLOC009",
+    "employee_id": "EMP010",
+    "project_id": "PRJ004",
+    "start_date": "2024-08-01",
+    "end_date": "2025-05-31",
+    "performance_rating": 4.7,
+    "role": "Security Engineer"
+  },
+  {
+    "allocation_id": "ALLOC010",
+    "employee_id": "EMP011",
+    "project_id": "PRJ005",
+    "start_date": "2025-04-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.5,
+    "role": "AI/ML Engineer"
+  },
+  {
+    "allocation_id": "ALLOC011",
+    "employee_id": "EMP012",
+    "project_id": "PRJ008",
+    "start_date": "2025-01-01",
+    "end_date": "2026-04-30",
+    "performance_rating": 4.4,
+    "role": "Mobile Developer"
+  },
+  {
+    "allocation_id": "ALLOC012",
+    "employee_id": "EMP013",
+    "project_id": "PRJ002",
+    "start_date": "2024-07-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.1,
+    "role": "QA Engineer"
+  },
+  {
+    "allocation_id": "ALLOC013",
+    "employee_id": "EMP014",
+    "project_id": "PRJ009",
+    "start_date": "2025-05-01",
+    "end_date": "2026-09-14",
+    "performance_rating": 4.6,
+    "role": "Salesforce Developer"
+  },
+  {
+    "allocation_id": "ALLOC014",
+    "employee_id": "EMP015",
+    "project_id": "PRJ001",
+    "start_date": "2025-06-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.8,
+    "role": "GenAI Engineer"
+  },
+  {
+    "allocation_id": "ALLOC015",
+    "employee_id": "EMP016",
+    "project_id": "PRJ003",
+    "start_date": "2025-09-01",
+    "end_date": "2026-06-15",
+    "performance_rating": 4.3,
+    "role": "Frontend Developer"
+  },
+  {
+    "allocation_id": "ALLOC016",
+    "employee_id": "EMP017",
+    "project_id": "PRJ006",
+    "start_date": "2025-03-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.5,
+    "role": "Backend Developer"
+  },
+  {
+    "allocation_id": "ALLOC017",
+    "employee_id": "EMP018",
+    "project_id": "PRJ002",
+    "start_date": "2024-06-01",
+    "end_date": "2026-05-31",
+    "performance_rating": 4.6,
+    "role": "Scrum Master"
+  },
+  {
+    "allocation_id": "ALLOC018",
+    "employee_id": "EMP019",
+    "project_id": "PRJ010",
+    "start_date": "2025-02-01",
+    "end_date": "2026-08-19",
+    "performance_rating": 4.7,
+    "role": "Cloud Architect"
+  },
+  {
+    "allocation_id": "ALLOC019",
+    "employee_id": "EMP020",
+    "project_id": "PRJ005",
+    "start_date": "2025-01-01",
+    "end_date": "2026-06-30",
+    "performance_rating": 4.0,
+    "role": "QA Analyst"
+  },
+  {
+    "allocation_id": "ALLOC020",
+    "employee_id": "EMP009",
+    "project_id": "PRJ001",
+    "start_date": "2025-04-01",
+    "end_date": "2026-06-15",
+    "performance_rating": 3.9,
+    "role": "Full Stack Developer"
+  }
+]
