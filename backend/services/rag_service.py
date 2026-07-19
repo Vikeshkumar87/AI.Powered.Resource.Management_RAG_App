@@ -64,8 +64,11 @@ async def query_rag(query: str, top_k: int = 3) -> dict:
     # Step 1: Retrieve top-K similar employees from FAISS
     try:
         candidates = search_similar_employees(query, top_k=top_k + 2)
-    except FileNotFoundError as e:
-        return {"error": str(e), "recommendations": []}
+    except FileNotFoundError:
+        return {
+            "error": "Vector index is not initialized. Please run indexing first.",
+            "recommendations": [],
+        }
 
     # Step 2: Filter to available or partial employees first
     available = [c for c in candidates if c.get("availability") in ("available", "partial")]
@@ -94,14 +97,14 @@ async def query_rag(query: str, top_k: int = 3) -> dict:
             response_format={"type": "json_object"},
         )
         result = json.loads(response.choices[0].message.content)
-    except Exception as e:
+    except Exception:
         # Fallback: return structured results from FAISS scores without LLM
-        result = _fallback_recommendations(candidates_for_llm, top_k, str(e))
+        result = _fallback_recommendations(candidates_for_llm, top_k)
 
     return result
 
 
-def _fallback_recommendations(candidates: list[dict], top_k: int, error: str) -> dict:
+def _fallback_recommendations(candidates: list[dict], top_k: int) -> dict:
     """Return FAISS-based recommendations without LLM when OpenAI is unavailable."""
     recommendations = []
     for emp in candidates[:top_k]:
@@ -119,5 +122,5 @@ def _fallback_recommendations(candidates: list[dict], top_k: int, error: str) ->
         })
     return {
         "recommendations": recommendations,
-        "summary": f"Results based on semantic similarity (LLM unavailable: {error})",
+        "summary": "Results based on semantic similarity (LLM unavailable).",
     }
