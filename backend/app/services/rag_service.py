@@ -36,7 +36,13 @@ def _get_llm_client():
     if provider == "ollama":
         try:
             import httpx
-            return ("ollama", httpx.Client(base_url=settings.ollama_base_url))
+            return (
+                "ollama",
+                httpx.Client(
+                    base_url=settings.ollama_base_url,
+                    timeout=httpx.Timeout(120.0, connect=10.0),
+                ),
+            )
         except ImportError:
             logger.warning("httpx not available for Ollama")
 

@@ -1,16 +1,62 @@
-# React + Vite
+# Frontend React README
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+This document covers frontend setup, development, and build/deploy flow.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- React 19
+- Vite
 
-## React Compiler
+## Install Dependencies
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```powershell
+cd frontend-react
+npm install
+```
 
-## Expanding the Oxlint configuration
+If `npm` is not available in your shell, use:
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+```powershell
+& 'C:\Program Files\nodejs\npm.cmd' install
+```
+
+## Run Frontend in Development Mode
+
+```powershell
+npm run dev
+```
+
+Default URL: `http://localhost:5173`
+
+In development, `/api/*` calls are proxied to backend `http://localhost:8000` by `vite.config.js`.
+
+## Build Frontend for FastAPI Serving
+
+```powershell
+npm run build
+```
+
+Build output is generated in `frontend-react/dist`.
+
+FastAPI serves this build at `http://127.0.0.1:8000/` when backend is running.
+
+## Optional Preview
+
+```powershell
+npm run preview
+```
+
+## Common Workflow
+
+1. Start backend from project root.
+2. Start frontend dev server in `frontend-react`.
+3. Develop and verify pages/components.
+4. Run `npm run build` before production/backend-served usage.
+
+## One-Command Startup
+
+From repo root:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-all.ps1 -FrontendMode dev
+```

@@ -144,20 +144,27 @@ class VectorStoreService:
 
         try:
             query_embedding = self._embed(query)
-            where_filter = {}
+            conditions = []
 
             if filter_type:
-                where_filter["type"] = {"$eq": filter_type}
+                conditions.append({"type": {"$eq": filter_type}})
 
             if filter_bench is not None:
-                where_filter["is_on_bench"] = {"$eq": str(filter_bench)}
+                conditions.append({"is_on_bench": {"$eq": str(filter_bench)}})
+
+            where_filter = None
+            if len(conditions) == 1:
+                where_filter = conditions[0]
+            elif len(conditions) > 1:
+                # Chroma expects one top-level operator when combining metadata filters.
+                where_filter = {"$and": conditions}
 
             kwargs = {
                 "query_embeddings": [query_embedding],
                 "n_results": min(n_results, self._collection.count() or 1),
                 "include": ["documents", "metadatas", "distances"],
             }
-            if where_filter:
+            if where_filter is not None:
                 kwargs["where"] = where_filter
 
             results = self._collection.query(**kwargs)
