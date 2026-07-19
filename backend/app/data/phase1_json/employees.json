@@ -1,0 +1,454 @@
+[
+  {
+    "name": "Arjun Sharma",
+    "email": "arjun.sharma@company.com",
+    "employee_id": "EMP001",
+    "department": "Engineering",
+    "designation": "Senior Software Engineer",
+    "skills": [
+      "Python",
+      "FastAPI",
+      "PostgreSQL",
+      "Docker",
+      "Kubernetes",
+      "AWS"
+    ],
+    "experience_years": 7.5,
+    "location": "Bangalore",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-07-09T11:16:47.656562",
+    "expected_allocation_date": "2026-08-08T11:16:47.656562",
+    "bio": "Experienced backend engineer with strong cloud infrastructure skills.",
+    "certifications": [
+      "AWS Solutions Architect",
+      "CKA"
+    ],
+    "preferred_roles": [
+      "Backend Lead",
+      "DevOps Engineer"
+    ],
+    "hourly_rate": 85.0
+  },
+  {
+    "name": "Priya Nair",
+    "email": "priya.nair@company.com",
+    "employee_id": "EMP002",
+    "department": "Engineering",
+    "designation": "Full Stack Developer",
+    "skills": [
+      "React",
+      "Node.js",
+      "TypeScript",
+      "MongoDB",
+      "GraphQL",
+      "Docker"
+    ],
+    "experience_years": 4.5,
+    "location": "Hyderabad",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-06-24T11:16:47.656562",
+    "expected_allocation_date": "2026-07-24T11:16:47.656562",
+    "bio": "Full stack developer specializing in modern JavaScript ecosystem.",
+    "certifications": [
+      "AWS Developer Associate"
+    ],
+    "preferred_roles": [
+      "Full Stack Developer",
+      "Frontend Lead"
+    ],
+    "hourly_rate": 65.0
+  },
+  {
+    "name": "Rahul Gupta",
+    "email": "rahul.gupta@company.com",
+    "employee_id": "EMP003",
+    "department": "Data Science",
+    "designation": "Senior Data Scientist",
+    "skills": [
+      "Python",
+      "Machine Learning",
+      "TensorFlow",
+      "PyTorch",
+      "SQL",
+      "Spark",
+      "NLP"
+    ],
+    "experience_years": 6.0,
+    "location": "Pune",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-06-04T11:16:47.656562",
+    "expected_allocation_date": "2026-08-03T11:16:47.656562",
+    "bio": "Data scientist with expertise in NLP and deep learning.",
+    "certifications": [
+      "Google Cloud Professional Data Engineer",
+      "TensorFlow Developer"
+    ],
+    "preferred_roles": [
+      "Data Science Lead",
+      "ML Engineer"
+    ],
+    "hourly_rate": 90.0
+  },
+  {
+    "name": "Sneha Patel",
+    "email": "sneha.patel@company.com",
+    "employee_id": "EMP004",
+    "department": "Engineering",
+    "designation": "DevOps Engineer",
+    "skills": [
+      "Kubernetes",
+      "Docker",
+      "Terraform",
+      "Jenkins",
+      "AWS",
+      "Azure",
+      "Linux"
+    ],
+    "experience_years": 5.0,
+    "location": "Mumbai",
+    "availability_percentage": 50.0,
+    "is_on_bench": false,
+    "bio": "DevOps specialist with multi-cloud expertise.",
+    "certifications": [
+      "AWS DevOps Professional",
+      "Azure DevOps Expert",
+      "CKA"
+    ],
+    "preferred_roles": [
+      "DevOps Lead",
+      "Site Reliability Engineer"
+    ],
+    "hourly_rate": 80.0
+  },
+  {
+    "name": "Vikram Singh",
+    "email": "vikram.singh@company.com",
+    "employee_id": "EMP005",
+    "department": "Engineering",
+    "designation": "Software Architect",
+    "skills": [
+      "Java",
+      "Spring Boot",
+      "Microservices",
+      "AWS",
+      "Kafka",
+      "Redis",
+      "PostgreSQL"
+    ],
+    "experience_years": 12.0,
+    "location": "Delhi",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-07-14T11:16:47.656562",
+    "expected_allocation_date": "2026-08-18T11:16:47.656562",
+    "bio": "Seasoned software architect with expertise in enterprise microservices.",
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Java OCP"
+    ],
+    "preferred_roles": [
+      "Solution Architect",
+      "Technical Lead"
+    ],
+    "hourly_rate": 120.0
+  },
+  {
+    "name": "Ananya Krishnamurthy",
+    "email": "ananya.k@company.com",
+    "employee_id": "EMP006",
+    "department": "Data Science",
+    "designation": "Machine Learning Engineer",
+    "skills": [
+      "Python",
+      "Scikit-learn",
+      "MLflow",
+      "AWS SageMaker",
+      "SQL",
+      "Feature Engineering"
+    ],
+    "experience_years": 3.5,
+    "location": "Bangalore",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-06-29T11:16:47.656562",
+    "expected_allocation_date": "2026-07-29T11:16:47.656562",
+    "bio": "ML engineer focused on model deployment and MLOps.",
+    "certifications": [
+      "AWS Machine Learning Specialty"
+    ],
+    "preferred_roles": [
+      "ML Engineer",
+      "Data Scientist"
+    ],
+    "hourly_rate": 75.0
+  },
+  {
+    "name": "Karthik Rajan",
+    "email": "karthik.rajan@company.com",
+    "employee_id": "EMP007",
+    "department": "Frontend",
+    "designation": "Senior Frontend Developer",
+    "skills": [
+      "React",
+      "Vue.js",
+      "TypeScript",
+      "CSS3",
+      "Webpack",
+      "Jest",
+      "Cypress"
+    ],
+    "experience_years": 6.0,
+    "location": "Chennai",
+    "availability_percentage": 0.0,
+    "is_on_bench": false,
+    "bio": "Frontend specialist with strong UX sensibilities.",
+    "certifications": [
+      "Google UX Design Certificate"
+    ],
+    "preferred_roles": [
+      "Frontend Lead",
+      "UI/UX Developer"
+    ],
+    "hourly_rate": 70.0
+  },
+  {
+    "name": "Meera Iyer",
+    "email": "meera.iyer@company.com",
+    "employee_id": "EMP008",
+    "department": "QA",
+    "designation": "Senior QA Engineer",
+    "skills": [
+      "Selenium",
+      "Python",
+      "Cypress",
+      "JMeter",
+      "Postman",
+      "JIRA",
+      "TestRail"
+    ],
+    "experience_years": 5.5,
+    "location": "Hyderabad",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-05-18T11:16:47.656562",
+    "expected_allocation_date": "2026-07-26T11:16:47.656562",
+    "bio": "QA engineer with automation expertise and performance testing skills.",
+    "certifications": [
+      "ISTQB Advanced",
+      "Selenium WebDriver Expert"
+    ],
+    "preferred_roles": [
+      "QA Lead",
+      "Test Automation Engineer"
+    ],
+    "hourly_rate": 60.0
+  },
+  {
+    "name": "Suresh Babu",
+    "email": "suresh.babu@company.com",
+    "employee_id": "EMP009",
+    "department": "Engineering",
+    "designation": "Backend Developer",
+    "skills": [
+      "Go",
+      "gRPC",
+      "PostgreSQL",
+      "Redis",
+      "Docker",
+      "Kubernetes"
+    ],
+    "experience_years": 4.0,
+    "location": "Bangalore",
+    "availability_percentage": 0.0,
+    "is_on_bench": false,
+    "bio": "Go developer specializing in high-performance backend services.",
+    "certifications": [
+      "CKA"
+    ],
+    "preferred_roles": [
+      "Backend Developer",
+      "Platform Engineer"
+    ],
+    "hourly_rate": 72.0
+  },
+  {
+    "name": "Divya Menon",
+    "email": "divya.menon@company.com",
+    "employee_id": "EMP010",
+    "department": "Engineering",
+    "designation": "Cloud Architect",
+    "skills": [
+      "AWS",
+      "Azure",
+      "GCP",
+      "Terraform",
+      "CloudFormation",
+      "Security",
+      "Networking"
+    ],
+    "experience_years": 9.0,
+    "location": "Kochi",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-07-04T11:16:47.656562",
+    "expected_allocation_date": "2026-08-13T11:16:47.656562",
+    "bio": "Multi-cloud architect with deep security expertise.",
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Azure Solutions Architect Expert",
+      "GCP Professional Cloud Architect"
+    ],
+    "preferred_roles": [
+      "Cloud Architect",
+      "Infrastructure Lead"
+    ],
+    "hourly_rate": 110.0
+  },
+  {
+    "name": "Arun Kumar",
+    "email": "arun.kumar@company.com",
+    "employee_id": "EMP011",
+    "department": "Engineering",
+    "designation": "Junior Software Developer",
+    "skills": [
+      "Python",
+      "Django",
+      "REST APIs",
+      "MySQL",
+      "Git"
+    ],
+    "experience_years": 1.5,
+    "location": "Pune",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-07-11T11:16:47.656562",
+    "bio": "Junior developer eager to learn and grow.",
+    "certifications": [],
+    "preferred_roles": [
+      "Backend Developer"
+    ],
+    "hourly_rate": 35.0
+  },
+  {
+    "name": "Neha Joshi",
+    "email": "neha.joshi@company.com",
+    "employee_id": "EMP012",
+    "department": "Product",
+    "designation": "Product Manager",
+    "skills": [
+      "Product Strategy",
+      "Agile",
+      "Scrum",
+      "JIRA",
+      "User Research",
+      "Data Analysis"
+    ],
+    "experience_years": 8.0,
+    "location": "Mumbai",
+    "availability_percentage": 0.0,
+    "is_on_bench": false,
+    "bio": "Experienced product manager with FinTech and HealthTech background.",
+    "certifications": [
+      "PMP",
+      "CSPO"
+    ],
+    "preferred_roles": [
+      "Product Manager",
+      "Program Manager"
+    ],
+    "hourly_rate": 95.0
+  },
+  {
+    "name": "Ravi Verma",
+    "email": "ravi.verma@company.com",
+    "employee_id": "EMP013",
+    "department": "Engineering",
+    "designation": "Android Developer",
+    "skills": [
+      "Kotlin",
+      "Java",
+      "Android SDK",
+      "Jetpack Compose",
+      "Firebase",
+      "REST APIs"
+    ],
+    "experience_years": 5.0,
+    "location": "Delhi",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-06-19T11:16:47.656562",
+    "expected_allocation_date": "2026-08-03T11:16:47.656562",
+    "bio": "Android developer with expertise in modern Android development.",
+    "certifications": [
+      "Google Associate Android Developer"
+    ],
+    "preferred_roles": [
+      "Android Lead",
+      "Mobile Developer"
+    ],
+    "hourly_rate": 68.0
+  },
+  {
+    "name": "Pooja Reddy",
+    "email": "pooja.reddy@company.com",
+    "employee_id": "EMP014",
+    "department": "Engineering",
+    "designation": "iOS Developer",
+    "skills": [
+      "Swift",
+      "SwiftUI",
+      "Objective-C",
+      "Xcode",
+      "Firebase",
+      "Core Data"
+    ],
+    "experience_years": 4.5,
+    "location": "Hyderabad",
+    "availability_percentage": 0.0,
+    "is_on_bench": false,
+    "bio": "iOS developer focused on creating intuitive mobile experiences.",
+    "certifications": [
+      "Apple Developer Certification"
+    ],
+    "preferred_roles": [
+      "iOS Lead",
+      "Mobile Developer"
+    ],
+    "hourly_rate": 65.0
+  },
+  {
+    "name": "Sanjay Mishra",
+    "email": "sanjay.mishra@company.com",
+    "employee_id": "EMP015",
+    "department": "Security",
+    "designation": "Security Engineer",
+    "skills": [
+      "Penetration Testing",
+      "OWASP",
+      "SIEM",
+      "AWS Security",
+      "Python",
+      "Compliance"
+    ],
+    "experience_years": 7.0,
+    "location": "Bangalore",
+    "availability_percentage": 100.0,
+    "is_on_bench": true,
+    "bench_start_date": "2026-06-14T11:16:47.656562",
+    "expected_allocation_date": "2026-08-08T11:16:47.656562",
+    "bio": "Security engineer with expertise in cloud security and compliance.",
+    "certifications": [
+      "CISSP",
+      "CEH",
+      "AWS Security Specialty"
+    ],
+    "preferred_roles": [
+      "Security Lead",
+      "Cloud Security Engineer"
+    ],
+    "hourly_rate": 100.0
+  }
+]

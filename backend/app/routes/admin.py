@@ -1,9 +1,10 @@
 """
-Admin routes for database management and system administration.
+Admin routes for database management, system administration, and phase validation.
 """
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import Dict, Any
+from pydantic import BaseModel, Field
 
 from app.database import get_db, create_tables
 from app.models.resource import Resource
@@ -14,9 +15,26 @@ from app.data.sample_data import (
     get_sample_projects,
     get_sample_allocations,
 )
+from app.data.phase1_preparation import save_phase1_json
 from app.services.vector_store import VectorStoreService
+from app.services.phase_pipeline import get_phase_pipeline_service
+from app.routes.auth import require_admin
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
+
+
+class Phase3RetrievalRequest(BaseModel):
+    staffing_request: str = Field(..., min_length=10, max_length=2000)
+    top_k: int = Field(default=5, ge=1, le=20)
+    min_availability: float = Field(default=50.0, ge=0.0, le=100.0)
+    max_utilization: float = Field(default=50.0, ge=0.0, le=100.0)
+
+
+class Phase4RecommendationRequest(BaseModel):
+    project_requirements: str = Field(..., min_length=10, max_length=3000)
+    required_skills: list[str] = Field(default_factory=list)
+    team_size: int = Field(default=3, ge=1, le=20)
+    top_k: int = Field(default=10, ge=1, le=20)
 
 
 def _get_vector_store() -> VectorStoreService:
@@ -200,3 +218,64 @@ def health_check(
             "active_allocations": db.query(Allocation).filter(Allocation.is_active == True).count(),
         },
     }
+
+
+@router.post("/phase1/prepare-data", summary="Phase 1: collect and store standardized JSON data")
+def prepare_phase1_data(_role: str = Depends(require_admin)) -> Dict[str, Any]:
+    """
+    Phase 1 data preparation:
+    - Collect employee and project sample data
+    - Standardize skills using taxonomy
+    - Store outputs as JSON files
+    """
+    summary = save_phase1_json()
+    return {
+        "status": "success",
+        "phase": "phase_1",
+        "message": "Employee/project data collected, standardized, and stored as JSON.",
+        **summary,
+    }
+
+
+@router.post("/phase2/build-rag", summary="Phase 2: build FAISS RAG pipeline")
+def build_phase2_rag_pipeline(_role: str = Depends(require_admin)) -> Dict[str, Any]:
+    """Phase 2: ingest employee/project documents, embed them, and store in FAISS."""
+    service = get_phase_pipeline_service()
+    return service.build_phase2_rag_pipeline()
+
+
+@router.post("/phase3/retrieve", summary="Phase 3: retrieve staffing matches")
+def validate_phase3_retrieval(
+    request: Phase3RetrievalRequest,
+    _role: str = Depends(require_admin),
+) -> Dict[str, Any]:
+    """Phase 3: convert staffing requests into embeddings and retrieve matching employees."""
+    service = get_phase_pipeline_service()
+    return service.retrieve_phase3(
+        staffing_request=request.staffing_request,
+        top_k=request.top_k,
+        min_availability=request.min_availability,
+        max_utilization=request.max_utilization,
+    )
+
+
+@router.post("/phase4/recommend", summary="Phase 4: recommendation engine")
+def validate_phase4_recommendations(
+    request: Phase4RecommendationRequest,
+    _role: str = Depends(require_admin),
+) -> Dict[str, Any]:
+    """Phase 4: return employees, scores, justifications, skill gaps, and upskilling suggestions."""
+    service = get_phase_pipeline_service()
+    return service.recommend_phase4(
+        project_requirements=request.project_requirements,
+        required_skills=request.required_skills,
+        team_size=request.team_size,
+        top_k=request.top_k,
+    )
+
+
+@router.get("/phase5/dashboard", summary="Phase 5: dashboard metrics")
+def validate_phase5_dashboard(_role: str = Depends(require_admin)) -> Dict[str, Any]:
+    """Phase 5: provide dashboard metrics, skill demand insights, and staffing recommendations."""
+    service = get_phase_pipeline_service()
+    return service.dashboard_phase5()

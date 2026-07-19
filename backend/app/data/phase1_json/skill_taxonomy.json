@@ -1,0 +1,104 @@
+{
+  "version": "1.0",
+  "domains": {
+    "backend": [
+      "Python",
+      "FastAPI",
+      "Django",
+      "Java",
+      "Spring Boot",
+      "Go",
+      "Node.js",
+      "Microservices",
+      "gRPC",
+      "REST APIs"
+    ],
+    "frontend": [
+      "React",
+      "Vue.js",
+      "TypeScript",
+      "CSS3",
+      "Webpack",
+      "GraphQL",
+      "Jest",
+      "Cypress"
+    ],
+    "data_ai": [
+      "Machine Learning",
+      "NLP",
+      "TensorFlow",
+      "PyTorch",
+      "Scikit-learn",
+      "Spark",
+      "MLflow",
+      "Feature Engineering",
+      "Data Analysis",
+      "Data Visualization"
+    ],
+    "cloud_devops": [
+      "AWS",
+      "Azure",
+      "GCP",
+      "Docker",
+      "Kubernetes",
+      "Terraform",
+      "Jenkins",
+      "CloudFormation",
+      "AWS SageMaker",
+      "Linux"
+    ],
+    "database": [
+      "SQL",
+      "PostgreSQL",
+      "MySQL",
+      "MongoDB",
+      "Redis",
+      "Core Data"
+    ],
+    "mobile": [
+      "Swift",
+      "SwiftUI",
+      "Objective-C",
+      "Kotlin",
+      "Android SDK",
+      "Jetpack Compose",
+      "React Native",
+      "Xcode",
+      "Firebase"
+    ],
+    "quality_security": [
+      "Selenium",
+      "JMeter",
+      "Postman",
+      "JIRA",
+      "TestRail",
+      "Penetration Testing",
+      "OWASP",
+      "SIEM",
+      "Security",
+      "Compliance",
+      "AWS Security"
+    ],
+    "product_management": [
+      "Product Strategy",
+      "Agile",
+      "Scrum",
+      "User Research",
+      "Networking"
+    ]
+  },
+  "synonyms": {
+    "rest api": "REST APIs",
+    "rest apis": "REST APIs",
+    "k8s": "Kubernetes",
+    "postgres": "PostgreSQL",
+    "postgresql": "PostgreSQL",
+    "ml": "Machine Learning",
+    "nlp": "NLP",
+    "js": "Node.js",
+    "google cloud": "GCP",
+    "google cloud platform": "GCP",
+    "terraform": "Terraform",
+    "aws sagemaker": "AWS SageMaker"
+  }
+}

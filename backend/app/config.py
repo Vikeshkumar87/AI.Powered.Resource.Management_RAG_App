@@ -6,6 +6,11 @@ from pydantic import ConfigDict
 from typing import List
 import json
 import os
+from pathlib import Path
+
+
+_BACKEND_ROOT = Path(__file__).resolve().parents[1]
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 
 class Settings(BaseSettings):
@@ -30,6 +35,14 @@ class Settings(BaseSettings):
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama2"
 
+    # Demo Authentication
+    admin_username: str = "admin"
+    admin_password: str = "admin123"
+    admin_display_name: str = "Administrator"
+    user_username: str = "user"
+    user_password: str = "user123"
+    user_display_name: str = "Standard User"
+
     # Embedding Model
     embedding_model: str = "all-MiniLM-L6-v2"
 
@@ -43,7 +56,13 @@ class Settings(BaseSettings):
     # Logging
     log_level: str = "INFO"
 
-    model_config = ConfigDict(env_file=".env", case_sensitive=False)
+    model_config = ConfigDict(
+        env_file=(
+            _PROJECT_ROOT / ".env",
+            _BACKEND_ROOT / ".env",
+        ),
+        case_sensitive=False,
+    )
 
 
 settings = Settings()

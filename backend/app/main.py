@@ -12,7 +12,7 @@ import os
 
 from app.config import settings
 from app.database import create_tables
-from app.routes import resources, projects, allocations, rag, dashboard, admin
+from app.routes import resources, projects, allocations, rag, dashboard, admin, auth
 
 # Configure logging
 logging.basicConfig(
@@ -77,18 +77,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Mount static files for frontend
-# Prefer the built React app (frontend-react/dist), fall back to legacy frontend
-_root = os.path.dirname(os.path.dirname(__file__))
-_react_dist = os.path.join(_root, "frontend-react", "dist")
-_legacy_frontend = os.path.join(_root, "frontend")
+# Mount static files for frontend.
+# backend/app/main.py -> project root is three levels up.
+_project_root = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+_react_dist = os.path.join(_project_root, "frontend-react", "dist")
 
 if os.path.exists(_react_dist):
     frontend_dir = _react_dist
     app.mount("/assets", StaticFiles(directory=os.path.join(_react_dist, "assets")), name="assets")
-elif os.path.exists(_legacy_frontend):
-    frontend_dir = _legacy_frontend
-    app.mount("/static", StaticFiles(directory=_legacy_frontend), name="static")
 else:
     frontend_dir = None
 
@@ -100,6 +96,7 @@ app.include_router(allocations.router, prefix="/api/v1")
 app.include_router(rag.router, prefix="/api/v1")
 app.include_router(dashboard.router, prefix="/api/v1")
 app.include_router(admin.router, prefix="/api/v1")
+app.include_router(auth.router, prefix="/api/v1")
 
 
 @app.get("/", tags=["Root"])
