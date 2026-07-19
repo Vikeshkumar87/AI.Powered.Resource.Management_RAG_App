@@ -3,11 +3,13 @@ RAG service: retrieves top-K similar employee profiles via FAISS,
 then asks an LLM to generate ranked recommendations with justifications.
 """
 import json
+import logging
 from openai import AsyncOpenAI
 from backend.config import settings
 from backend.services.embedding_service import search_similar_employees
 
 _client: AsyncOpenAI = None
+logger = logging.getLogger(__name__)
 
 
 def _get_openai_client() -> AsyncOpenAI:
@@ -98,6 +100,7 @@ async def query_rag(query: str, top_k: int = 3) -> dict:
         )
         result = json.loads(response.choices[0].message.content)
     except Exception:
+        logger.exception("OpenAI completion failed; falling back to similarity-only recommendations")
         # Fallback: return structured results from FAISS scores without LLM
         result = _fallback_recommendations(candidates_for_llm, top_k)
 
