@@ -8,10 +8,11 @@ from pydantic import BaseModel, Field
 
 from app.database import get_db
 from app.services.rag_service import RAGService
-
+# APIRouter is used to create a group of related API routes for RAG (Retrieval-Augmented Generation) queries and recommendations.
 router = APIRouter(prefix="/rag", tags=["RAG - AI Queries"])
 
-
+# Pydantic models for request and response validation
+# example usage of Pydantic models to define the structure of requests and responses for the RAG API endpoints.
 class QueryRequest(BaseModel):
     question: str = Field(
         ...,
@@ -30,7 +31,7 @@ class QueryRequest(BaseModel):
         description="If True, only search bench resources",
     )
 
-
+# example usage of Pydantic models to define the structure of requests and responses for the RAG API endpoints.
 class QueryResponse(BaseModel):
     question: str
     answer: str
@@ -63,11 +64,11 @@ class RecommendResponse(BaseModel):
     team_size_requested: int
     llm_provider: str
 
-
+ # Inject RAGService dependency for the routes
 def _get_rag_service() -> RAGService:
     return RAGService()
 
-
+# RAG query endpoint
 @router.post("/query", response_model=QueryResponse)
 def query_resources(
     request: QueryRequest,
@@ -96,7 +97,7 @@ def query_resources(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"RAG query failed: {str(e)}")
 
-
+# RAG recommendation endpoint
 @router.post("/recommend", response_model=RecommendResponse)
 def recommend_resources(
     request: RecommendRequest,
@@ -120,8 +121,11 @@ def recommend_resources(
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Recommendation failed: {str(e)}")
 
-
+# RAG semantic search endpoint
 @router.get("/search")
+# below is an example of how to use query parameters in FastAPI to perform a semantic search over resources and projects.   
+ # q: the search query string, n: number of results to return, type: optional filter for 'resource' or 'project', bench_only: optional boolean to filter only bench resources.
+ # n: number of results to return, type: optional filter for 'resource' or 'project', bench_only: optional boolean to filter only bench resources.
 def semantic_search(
     q: str = Query(..., min_length=3, description="Search query"),
     n: int = Query(5, ge=1, le=20, description="Number of results"),

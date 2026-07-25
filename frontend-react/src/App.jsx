@@ -5,10 +5,17 @@ import Resources from './pages/Resources';
 import Bench from './pages/Bench';
 import Projects from './pages/Projects';
 import AIQuery from './pages/AIQuery';
+import ChatAnalytics from './pages/ChatAnalytics';
 import Recommendations from './pages/Recommendations';
 import Phases from './pages/Phases';
+import EmployeeProfile from './pages/EmployeeProfile';
+import SkillDashboard from './pages/SkillDashboard';
+import ConversationHistory from './pages/ConversationHistory';
+import Feedback from './pages/Feedback';
+import Settings from './pages/Settings';
 import Login from './pages/Login';
 import { clearSession, loadSession, saveSession } from './auth';
+import { applyTheme, loadTheme, saveTheme } from './settingsStore';
 
 const SECTIONS = {
   phases: Phases,
@@ -16,12 +23,19 @@ const SECTIONS = {
   resources: Resources,
   bench: Bench,
   projects: Projects,
+  profiles: EmployeeProfile,
+  skills: SkillDashboard,
   'ai-query': AIQuery,
+  'chat-analytics': ChatAnalytics,
+  'conversation-history': ConversationHistory,
   recommendations: Recommendations,
+  feedback: Feedback,
+  settings: Settings,
 };
 
 export default function App() {
   const [session, setSession] = useState(() => loadSession());
+  const [theme, setTheme] = useState(() => loadTheme());
   const [activeSection, setActiveSection] = useState('dashboard');
 
   const links = useMemo(() => {
@@ -30,8 +44,14 @@ export default function App() {
       { id: 'resources', label: 'Resources' },
       { id: 'bench', label: 'Bench' },
       { id: 'projects', label: 'Projects' },
+      { id: 'profiles', label: 'Employee Profile' },
+      // { id: 'skills', label: 'Skill Dashboard' },
       { id: 'ai-query', label: 'AI Assistant' },
+      { id: 'chat-analytics', label: 'Chat Analytics' },
+      { id: 'conversation-history', label: 'Conversation History' },
       { id: 'recommendations', label: 'Recommendations' },
+      { id: 'feedback', label: 'Feedback' },
+      { id: 'settings', label: 'Settings' },
     ];
     if (session?.role === 'admin') {
       return [{ id: 'phases', label: 'Phases' }, ...baseLinks];
@@ -61,11 +81,17 @@ export default function App() {
     }
   }, [activeSection, resolvedSection, session]);
 
+  useEffect(() => {
+    applyTheme(theme);
+    saveTheme(theme);
+  }, [theme]);
+
   if (!session) {
     return <Login onLogin={handleLogin} />;
   }
 
   const PageComponent = SECTIONS[resolvedSection] || Dashboard;
+  const pageProps = resolvedSection === 'settings' ? { theme, onThemeChange: setTheme } : {};
 
   return (
     <>
@@ -74,11 +100,11 @@ export default function App() {
         onNavigate={setActiveSection}
         links={links}
         role={session.role}
-        displayName={session.display_name || session.username}
+        //displayName={session.role === 'user' ? session.username : (session.display_name || session.username)}
         onLogout={handleLogout}
       />
       <div className="container">
-        <PageComponent />
+        <PageComponent {...pageProps} />
       </div>
     </>
   );

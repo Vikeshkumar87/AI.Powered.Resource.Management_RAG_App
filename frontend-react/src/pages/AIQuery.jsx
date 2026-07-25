@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { api } from '../api';
+import { addChatHistory } from '../chatHistory';
 
 const EXAMPLE_QUERIES = [
   'Who are the Python developers on bench?',
@@ -14,6 +15,15 @@ function escapeHtml(text) {
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
+}
+
+function formatScorePercent(score) {
+  const numericScore = Number(score);
+  if (!Number.isFinite(numericScore)) {
+    return '0%';
+  }
+  const normalized = Math.max(0, Math.min(1, numericScore));
+  return `${Math.round(normalized * 100)}%`;
 }
 
 export default function AIQuery() {
@@ -40,6 +50,14 @@ export default function AIQuery() {
         }),
       });
       setResult(data);
+      addChatHistory({
+        id: `${Date.now()}-${Math.random().toString(16).slice(2, 8)}`,
+        timestamp: new Date().toISOString(),
+        question: question.trim(),
+        llm_provider: data.llm_provider,
+        context_used: data.context_used,
+        answer_preview: (data.answer || '').slice(0, 240),
+      });
     } catch (e) {
       setError(e.message);
     } finally {
@@ -114,16 +132,35 @@ export default function AIQuery() {
             {result.sources?.length > 0 && (
               <div className="query-sources">
                 <h4>📚 Context Sources ({result.sources.length})</h4>
-                {result.sources.map((s, i) => (
-                  <div key={i} className="source-item">
-                    <strong>#{i + 1}</strong> [Score: {(s.score * 100).toFixed(0)}%]{' '}
-                    {s.metadata?.type === 'resource' ? '🧑' : '📋'}{' '}
-                    <em>{s.metadata?.name || 'Unknown'}</em><br />
-                    <span style={{ color: '#9ca3af', fontSize: '0.75rem' }}>
-                      {s.content?.substring(0, 150)}...
-                    </span>
-                  </div>
-                ))}
+                <div className="table-wrap source-table-wrap">
+                  <table className="data-table source-table">
+                    <thead>
+                      <tr>
+                        <th>#</th>
+                        <th>Score</th>
+                        <th>Resource / Project</th>
+                        <th>Preview</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {result.sources.map((s, i) => (
+                        <tr key={i}>
+                          <td><strong>#{i + 1}</strong></td>
+                          <td>
+                            <span className="score-badge">{formatScorePercent(s.score)}</span>
+                          </td>
+                          <td>
+                            {s.metadata?.type === 'resource' ? '🧑' : '📋'}{' '}
+                            <strong>{s.metadata?.name || 'Unknown'}</strong>
+                          </td>
+                          <td>
+                            <span className="source-preview">{s.content?.substring(0, 150)}...</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
           </>

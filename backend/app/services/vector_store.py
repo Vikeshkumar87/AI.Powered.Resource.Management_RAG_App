@@ -6,16 +6,22 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-
+# VectorStoreService is responsible for managing the ChromaDB vector store, 
+# which is used to perform semantic search over resources and projects. 
+# It handles adding, updating, deleting, and searching documents in the
+#  vector store. The service uses SentenceTransformer to generate embeddings 
+# for text data, enabling efficient retrieval of relevant documents 
+# based on natural language queries.
 class VectorStoreService:
     """Manages ChromaDB vector store for resources and projects."""
-
+    # init method initializes the service, setting up the ChromaDB client, collection, and embedding model.
     def __init__(self):
         self._client = None
         self._collection = None
         self._embeddings = None
         self._initialized = False
-
+     # _initialize method lazily initializes the ChromaDB client, collection, and embedding model.
+     #  It ensures that the service is ready for use before performing any operations.
     def _initialize(self):
         """Lazily initialize ChromaDB and embedding model."""
         if self._initialized:
@@ -23,14 +29,18 @@ class VectorStoreService:
 
         try:
             import chromadb
-            from sentence_transformers import SentenceTransformer
+            from sentence_transformers import SentenceTransformer # SentenceTransformer is used to generate embeddings for text data
             from app.config import settings
 
             self._embeddings = SentenceTransformer(settings.embedding_model)
             self._client = chromadb.PersistentClient(path=settings.chroma_persist_dir)
             self._collection = self._client.get_or_create_collection(
                 name=settings.collection_name,
-                metadata={"hnsw:space": "cosine"},
+                metadata={"hnsw:space": "cosine"}, # Use cosine similarity for vector search
+                # cosine similarity is a common metric for measuring the similarity between two vectors,
+                #  especially in high-dimensional spaces.
+                #  It is often used in semantic search and recommendation systems to find items that are
+                #  similar to a given query or item.
             )
             self._initialized = True
             logger.info("VectorStoreService initialized successfully")

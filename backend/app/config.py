@@ -28,9 +28,9 @@ class Settings(BaseSettings):
     chroma_persist_dir: str = "./chroma_db"
     collection_name: str = "resource_management"
 
-    # LLM Configuration
+    # LLM Configuration 
     llm_provider: str = "demo"  # "openai", "ollama", or "demo"
-    openai_api_key: str = ""
+    openai_api_key: str = "" 
     openai_model: str = "gpt-3.5-turbo"
     ollama_base_url: str = "http://localhost:11434"
     ollama_model: str = "llama2"

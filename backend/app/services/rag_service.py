@@ -35,7 +35,7 @@ def _get_llm_client():
 
     if provider == "ollama":
         try:
-            import httpx
+            import httpx # httpx is used to make HTTP requests to the Ollama API
             return (
                 "ollama",
                 httpx.Client(
@@ -106,7 +106,7 @@ def _demo_response(context: str, query: str) -> str:
             f"{context}\n\n"
             "Please configure an LLM provider (OpenAI or Ollama) for more intelligent analysis."
         )
-
+    
     response_parts = [
         f"Based on your query: **'{query}'**\n",
         "Here are the most relevant matches from our resource database:\n",
