@@ -17,8 +17,8 @@
     "location": "Bangalore",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-07-09T11:16:47.656562",
-    "expected_allocation_date": "2026-08-08T11:16:47.656562",
+    "bench_start_date": "2026-07-15T18:40:08.931041",
+    "expected_allocation_date": "2026-08-14T18:40:08.931041",
     "bio": "Experienced backend engineer with strong cloud infrastructure skills.",
     "certifications": [
       "AWS Solutions Architect",
@@ -48,8 +48,8 @@
     "location": "Hyderabad",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-06-24T11:16:47.656562",
-    "expected_allocation_date": "2026-07-24T11:16:47.656562",
+    "bench_start_date": "2026-06-30T18:40:08.931041",
+    "expected_allocation_date": "2026-07-30T18:40:08.931041",
     "bio": "Full stack developer specializing in modern JavaScript ecosystem.",
     "certifications": [
       "AWS Developer Associate"
@@ -79,8 +79,8 @@
     "location": "Pune",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-06-04T11:16:47.656562",
-    "expected_allocation_date": "2026-08-03T11:16:47.656562",
+    "bench_start_date": "2026-06-10T18:40:08.931041",
+    "expected_allocation_date": "2026-08-09T18:40:08.931041",
     "bio": "Data scientist with expertise in NLP and deep learning.",
     "certifications": [
       "Google Cloud Professional Data Engineer",
@@ -142,8 +142,8 @@
     "location": "Delhi",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-07-14T11:16:47.656562",
-    "expected_allocation_date": "2026-08-18T11:16:47.656562",
+    "bench_start_date": "2026-07-20T18:40:08.931041",
+    "expected_allocation_date": "2026-08-24T18:40:08.931041",
     "bio": "Seasoned software architect with expertise in enterprise microservices.",
     "certifications": [
       "AWS Solutions Architect Professional",
@@ -173,8 +173,8 @@
     "location": "Bangalore",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-06-29T11:16:47.656562",
-    "expected_allocation_date": "2026-07-29T11:16:47.656562",
+    "bench_start_date": "2026-07-05T18:40:08.931041",
+    "expected_allocation_date": "2026-08-04T18:40:08.931041",
     "bio": "ML engineer focused on model deployment and MLOps.",
     "certifications": [
       "AWS Machine Learning Specialty"
@@ -233,8 +233,8 @@
     "location": "Hyderabad",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-05-18T11:16:47.656562",
-    "expected_allocation_date": "2026-07-26T11:16:47.656562",
+    "bench_start_date": "2026-05-24T18:40:08.931041",
+    "expected_allocation_date": "2026-08-01T18:40:08.931041",
     "bio": "QA engineer with automation expertise and performance testing skills.",
     "certifications": [
       "ISTQB Advanced",
@@ -293,8 +293,8 @@
     "location": "Kochi",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-07-04T11:16:47.656562",
-    "expected_allocation_date": "2026-08-13T11:16:47.656562",
+    "bench_start_date": "2026-07-10T18:40:08.931041",
+    "expected_allocation_date": "2026-08-19T18:40:08.931041",
     "bio": "Multi-cloud architect with deep security expertise.",
     "certifications": [
       "AWS Solutions Architect Professional",
@@ -324,7 +324,7 @@
     "location": "Pune",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-07-11T11:16:47.656562",
+    "bench_start_date": "2026-07-17T18:40:08.931041",
     "bio": "Junior developer eager to learn and grow.",
     "certifications": [],
     "preferred_roles": [
@@ -379,8 +379,8 @@
     "location": "Delhi",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-06-19T11:16:47.656562",
-    "expected_allocation_date": "2026-08-03T11:16:47.656562",
+    "bench_start_date": "2026-06-25T18:40:08.931041",
+    "expected_allocation_date": "2026-08-09T18:40:08.931041",
     "bio": "Android developer with expertise in modern Android development.",
     "certifications": [
       "Google Associate Android Developer"
@@ -437,8 +437,8 @@
     "location": "Bangalore",
     "availability_percentage": 100.0,
     "is_on_bench": true,
-    "bench_start_date": "2026-06-14T11:16:47.656562",
-    "expected_allocation_date": "2026-08-08T11:16:47.656562",
+    "bench_start_date": "2026-06-20T18:40:08.931041",
+    "expected_allocation_date": "2026-08-14T18:40:08.931041",
     "bio": "Security engineer with expertise in cloud security and compliance.",
     "certifications": [
       "CISSP",
