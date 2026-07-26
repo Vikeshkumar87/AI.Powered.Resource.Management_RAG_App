@@ -26,6 +26,22 @@ function formatScorePercent(score) {
   return `${Math.round(normalized * 100)}%`;
 }
 
+function normalizeScore(score) {
+  const numericScore = Number(score);
+  if (!Number.isFinite(numericScore)) {
+    return 0;
+  }
+  return Math.max(0, Math.min(1, numericScore));
+}
+
+function scoreBand(score) {
+  const value = normalizeScore(score);
+  if (value >= 0.8) return 'High match';
+  if (value >= 0.6) return 'Good match';
+  if (value >= 0.4) return 'Moderate match';
+  return 'Low match';
+}
+
 export default function AIQuery() {
   const [question, setQuestion] = useState('');
   const [benchOnly, setBenchOnly] = useState(false);
@@ -132,12 +148,18 @@ export default function AIQuery() {
             {result.sources?.length > 0 && (
               <div className="query-sources">
                 <h4>📚 Context Sources ({result.sources.length})</h4>
+                <div className="score-logic-note">
+                  <strong>Score logic:</strong> We retrieve the top {result.context_used || result.sources.length} semantic matches (default 5).{' '}
+                  Each score is computed as <code>1 - distance</code>, then clamped to the 0-1 range and shown as a percentage.{' '}
+                  Higher score means stronger semantic relevance to your question.
+                </div>
                 <div className="table-wrap source-table-wrap">
                   <table className="data-table source-table">
                     <thead>
                       <tr>
                         <th>#</th>
                         <th>Score</th>
+                        <th>Match level</th>
                         <th>Resource / Project</th>
                         <th>Preview</th>
                       </tr>
@@ -149,6 +171,7 @@ export default function AIQuery() {
                           <td>
                             <span className="score-badge">{formatScorePercent(s.score)}</span>
                           </td>
+                          <td>{scoreBand(s.score)}</td>
                           <td>
                             {s.metadata?.type === 'resource' ? '🧑' : '📋'}{' '}
                             <strong>{s.metadata?.name || 'Unknown'}</strong>
