@@ -13,24 +13,46 @@ from __future__ import annotations
 
 import json
 import logging
-from pathlib import Path
+from pathlib import Path # Path is used to handle file paths in a platform-independent way
 from typing import Any, Dict, List, Optional, Tuple
 
 import numpy as np
 
 try:
-    import faiss  # type: ignore
+    import faiss  # type: ignore faiss is used for efficient similarity search and clustering of dense vectors
 except ImportError:  # pragma: no cover - optional fallback only
     faiss = None
 
 try:
     from app.config import settings
     from app.data.phase1_preparation import SKILL_TAXONOMY, prepare_phase1_data, save_phase1_json
+    from app.database import SessionLocal
+    from app.models.resource import Resource
+    from app.models.project import Project
+    from app.models.allocation import Allocation
 except ModuleNotFoundError:  # pragma: no cover - package import fallback
+    # Only fallback for package path resolution issues, not missing third-party deps.
+    import sys
+    exc = sys.exc_info()[1]
+    if getattr(exc, "name", "") not in {
+        "app",
+        "app.config",
+        "app.data.phase1_preparation",
+        "app.database",
+        "app.models.resource",
+        "app.models.project",
+        "app.models.allocation",
+    }:
+        raise
     from backend.app.config import settings
     from backend.app.data.phase1_preparation import SKILL_TAXONOMY, prepare_phase1_data, save_phase1_json
+    from backend.app.database import SessionLocal
+    from backend.app.models.resource import Resource
+    from backend.app.models.project import Project
+    from backend.app.models.allocation import Allocation
 
 from sentence_transformers import SentenceTransformer
+ # SentenceTransformer is used to generate embeddings for text data
 
 logger = logging.getLogger(__name__)
 
@@ -129,17 +151,86 @@ def _coverage_summary(required_skills: List[str], candidates: List[Dict[str, Any
     return {"skill_gaps": gaps, "upskilling_suggestions": suggestions}
 
 
+def _normalize_label(value: str) -> str:
+    return " ".join((value or "").strip().lower().split())
+
+
 class PhasePipelineService:
     """Phase 2-5 pipeline backed by FAISS and sentence embeddings."""
 
     def __init__(self):
         self._model = SentenceTransformer(settings.embedding_model)
         self._resources, self._projects = _load_phase1_payloads()
+        self._resource_project_history = self._load_resource_project_history()
         self._artifacts = _phase2_dir()
         self._artifacts.mkdir(parents=True, exist_ok=True)
         self._documents: List[Dict[str, Any]] = []
         self._index = None
         self._embeddings: Optional[np.ndarray] = None
+
+    def _load_resource_project_history(self) -> Dict[str, List[Dict[str, Any]]]:
+        """Load resource allocation/project history from DB for history-aware matching."""
+        history: Dict[str, List[Dict[str, Any]]] = {}
+
+        try:
+            db = SessionLocal()
+        except Exception as exc:  # pragma: no cover - runtime fallback
+            logger.warning("Unable to initialize DB session for project history: %s", exc)
+            return history
+
+        try:
+            rows = (
+                db.query(Resource.employee_id, Allocation.role, Project.name, Project.domain, Project.required_skills, Project.description)
+                .join(Allocation, Allocation.resource_id == Resource.id)
+                .join(Project, Allocation.project_id == Project.id)
+                .all()
+            )
+
+            for employee_id, role, project_name, domain, required_skills, description in rows:
+                history.setdefault(employee_id, []).append(
+                    {
+                        "role": role,
+                        "project_name": project_name,
+                        "domain": domain,
+                        "required_skills": required_skills or [],
+                        "description": description or "",
+                    }
+                )
+        except Exception as exc:  # pragma: no cover - runtime fallback
+            logger.warning("Project history load skipped due to DB issue: %s", exc)
+        finally:
+            db.close()
+
+        return history
+
+    def _project_history_score(self, employee_id: str, project_requirements: str, required_skills: List[str]) -> float:
+        """Calculate a history relevance score based on prior allocations/projects."""
+        history_rows = self._resource_project_history.get(employee_id, [])
+        if not history_rows:
+            return 0.0
+
+        required_set = {_normalize_label(skill) for skill in required_skills if skill and skill.strip()}
+        historical_skill_set = {
+            _normalize_label(skill)
+            for row in history_rows
+            for skill in (row.get("required_skills") or [])
+            if isinstance(skill, str)
+        }
+        skill_overlap_score = 0.0
+        if required_set:
+            skill_overlap_score = len(required_set.intersection(historical_skill_set)) / len(required_set)
+
+        history_text = " ".join(
+            f"{row.get('project_name', '')} {row.get('domain', '')} {row.get('description', '')}"
+            for row in history_rows
+        ).strip()
+        semantic_history_score = 0.0
+        if history_text:
+            query_emb = self._model.encode([project_requirements], convert_to_numpy=True, normalize_embeddings=True)
+            history_emb = self._model.encode([history_text], convert_to_numpy=True, normalize_embeddings=True)
+            semantic_history_score = float(np.dot(query_emb[0], history_emb[0]))
+
+        return round((0.6 * skill_overlap_score) + (0.4 * max(0.0, semantic_history_score)), 4)
 
     @property
     def faiss_available(self) -> bool:
@@ -154,6 +245,7 @@ class PhasePipelineService:
                     "type": "resource",
                     "name": resource.get("name"),
                     "skills": resource.get("skills", []),
+                    "certifications": resource.get("certifications", []),
                     "availability_percentage": resource.get("availability_percentage", 0),
                     "utilization_percentage": round(100.0 - float(resource.get("availability_percentage", 0)), 1),
                     "is_on_bench": bool(resource.get("is_on_bench")),
@@ -321,14 +413,25 @@ class PhasePipelineService:
         required_skills: List[str],
         team_size: int = 3,
         top_k: int = 10,
+        min_experience_years: float = 0.0,
+        max_experience_years: Optional[float] = None,
+        required_certifications: Optional[List[str]] = None,
     ) -> Dict[str, Any]:
         """Phase 4: recommendation engine outputs."""
         ranked = self._search(project_requirements, top_k=max(top_k * 2, top_k))
         required = [skill.strip() for skill in required_skills if skill and skill.strip()]
+        required_certifications = [c.strip() for c in (required_certifications or []) if c and c.strip()]
+        required_certs_set = {_normalize_label(c) for c in required_certifications}
 
         recommendations: List[Dict[str, Any]] = []
         for row in ranked:
             if row["type"] != "resource":
+                continue
+
+            experience_years = float(row.get("experience_years", 0) or 0)
+            if experience_years < float(min_experience_years or 0):
+                continue
+            if max_experience_years is not None and experience_years > float(max_experience_years):
                 continue
 
             resource_skills = set(row.get("skills", []))
@@ -336,15 +439,46 @@ class PhasePipelineService:
             overlap = resource_skills.intersection(required_set)
             overlap_score = (len(overlap) / len(required_set)) if required_set else 0.0
             availability_score = float(row.get("availability_percentage", 0)) / 100.0
-            experience_score = min(float(row.get("experience_years", 0)) / 10.0, 1.0)
+            experience_score = min(experience_years / 10.0, 1.0)
             semantic_score = float(row.get("match_score", 0.0))
-            final_score = round((semantic_score * 0.5) + (overlap_score * 0.35) + (availability_score * 0.1) + (experience_score * 0.05), 4)
+
+            resource_certifications = [c for c in row.get("certifications", []) if isinstance(c, str)]
+            cert_set = {_normalize_label(c) for c in resource_certifications}
+            certification_overlap = required_certs_set.intersection(cert_set)
+            certification_score = (
+                len(certification_overlap) / len(required_certs_set)
+                if required_certs_set
+                else 0.0
+            )
+
+            history_score = self._project_history_score(
+                employee_id=row.get("id", "").replace("resource_", ""),
+                project_requirements=project_requirements,
+                required_skills=required,
+            )
+
+            final_score = round(
+                max(
+                    0.0,
+                    min(
+                        1.0,
+                        (semantic_score * 0.40)
+                        + (overlap_score * 0.25)
+                        + (availability_score * 0.10)
+                        + (experience_score * 0.10)
+                        + (certification_score * 0.10)
+                        + (history_score * 0.05),
+                    ),
+                ),
+                4,
+            )
 
             recommendations.append({
                 "resource_id": row.get("id"),
                 "name": row.get("name"),
                 "department": row.get("department"),
                 "skills": row.get("skills", []),
+                "certifications": resource_certifications,
                 "availability_percentage": row.get("availability_percentage", 0),
                 "utilization_percentage": row.get("utilization_percentage", 0),
                 "match_score": final_score,
@@ -353,11 +487,15 @@ class PhasePipelineService:
                     "skill_overlap": round(overlap_score, 4),
                     "availability": round(availability_score, 4),
                     "experience": round(experience_score, 4),
+                    "certification_match": round(certification_score, 4),
+                    "project_history": round(history_score, 4),
                 },
                 "justification": (
                     f"Matched skills: {', '.join(sorted(overlap)) or 'none'}; "
+                    f"certifications matched: {', '.join(sorted(certification_overlap)) or 'none'}; "
+                    f"history score: {round(history_score * 100)}%; "
                     f"availability: {row.get('availability_percentage', 0)}%; "
-                    f"experience: {row.get('experience_years', 0)} years."
+                    f"experience: {experience_years} years."
                 ),
             })
 
@@ -370,6 +508,11 @@ class PhasePipelineService:
             "status": "success",
             "project_requirements": project_requirements,
             "required_skills": required,
+            "required_certifications": required_certifications,
+            "experience_filter": {
+                "min_experience_years": min_experience_years,
+                "max_experience_years": max_experience_years,
+            },
             "team_size": team_size,
             "recommended_employees": selected,
             "match_scores": [

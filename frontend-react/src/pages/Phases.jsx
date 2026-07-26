@@ -4,6 +4,7 @@ import { api } from '../api';
 const DEFAULT_PHASE3_REQUEST = 'Need a Python FastAPI backend developer with high availability for a new service';
 const DEFAULT_PHASE4_REQUIREMENTS = 'Need senior backend developers for a FinTech microservices project using Java, Spring Boot, and Kafka';
 const DEFAULT_PHASE4_SKILLS = 'Java, Spring Boot, Microservices, Kafka, PostgreSQL';
+const DEFAULT_PHASE4_CERTIFICATIONS = 'AWS Solutions Architect';
 
 function parseSkills(text) {
   return (text || '')
@@ -56,8 +57,11 @@ export default function Phases() {
   const [phase3Result, setPhase3Result] = useState(null);
   const [phase4Requirements, setPhase4Requirements] = useState(DEFAULT_PHASE4_REQUIREMENTS);
   const [phase4Skills, setPhase4Skills] = useState(DEFAULT_PHASE4_SKILLS);
+  const [phase4Certifications, setPhase4Certifications] = useState(DEFAULT_PHASE4_CERTIFICATIONS);
   const [phase4TeamSize, setPhase4TeamSize] = useState(3);
   const [phase4TopK, setPhase4TopK] = useState(10);
+  const [phase4MinExperienceYears, setPhase4MinExperienceYears] = useState(0);
+  const [phase4MaxExperienceYears, setPhase4MaxExperienceYears] = useState('');
   const [phase4Result, setPhase4Result] = useState(null);
   const [phase5Result, setPhase5Result] = useState(null);
   const [running, setRunning] = useState({});
@@ -134,8 +138,11 @@ export default function Phases() {
         body: JSON.stringify({
           project_requirements: phase4Requirements.trim(),
           required_skills: parseSkills(phase4Skills),
+          required_certifications: parseSkills(phase4Certifications),
           team_size: Number(phase4TeamSize) || 1,
           top_k: Number(phase4TopK) || 10,
+          min_experience_years: Number(phase4MinExperienceYears) || 0,
+          max_experience_years: phase4MaxExperienceYears === '' ? null : Number(phase4MaxExperienceYears),
         }),
       });
       setPhase4Result(data);
@@ -341,6 +348,16 @@ export default function Phases() {
                 <input className="form-input" type="text" value={phase4Skills} onChange={e => setPhase4Skills(e.target.value)} />
               </label>
               <label className="form-group">
+                <span>Required certifications</span>
+                <input
+                  className="form-input"
+                  type="text"
+                  value={phase4Certifications}
+                  onChange={e => setPhase4Certifications(e.target.value)}
+                  placeholder="AWS Solutions Architect, Azure Developer Associate"
+                />
+              </label>
+              <label className="form-group">
                 <span>Team size</span>
                 <input className="form-input" type="number" min={1} max={20} value={phase4TeamSize} onChange={e => setPhase4TeamSize(e.target.value)} />
               </label>
@@ -348,12 +365,43 @@ export default function Phases() {
                 <span>Top K</span>
                 <input className="form-input" type="number" min={1} max={20} value={phase4TopK} onChange={e => setPhase4TopK(e.target.value)} />
               </label>
+              <label className="form-group">
+                <span>Min experience (years)</span>
+                <input
+                  className="form-input"
+                  type="number"
+                  min={0}
+                  max={60}
+                  step="0.5"
+                  value={phase4MinExperienceYears}
+                  onChange={e => setPhase4MinExperienceYears(e.target.value)}
+                />
+              </label>
+              <label className="form-group">
+                <span>Max experience (years, optional)</span>
+                <input
+                  className="form-input"
+                  type="number"
+                  min={0}
+                  max={60}
+                  step="0.5"
+                  value={phase4MaxExperienceYears}
+                  onChange={e => setPhase4MaxExperienceYears(e.target.value)}
+                  placeholder="Leave empty for no maximum"
+                />
+              </label>
             </div>
           </div>
           {phase4Result && (
             <div className="phase-output-stack">
               <div className="phase-pill-row">
                 <span className="phase-pill">Team size: {phase4Result.team_size}</span>
+                <span className="phase-pill">
+                  Experience filter: {phase4Result.experience_filter?.min_experience_years ?? 0}
+                  {' - '}
+                  {phase4Result.experience_filter?.max_experience_years ?? 'No max'} yrs
+                </span>
+                <span className="phase-pill">Required certs: {(phase4Result.required_certifications || []).length}</span>
                 <span className="phase-pill">Skill gaps: {(phase4Result.skill_gaps || []).length}</span>
                 <span className="phase-pill">Upskilling ideas: {(phase4Result.upskilling_suggestions || []).length}</span>
               </div>

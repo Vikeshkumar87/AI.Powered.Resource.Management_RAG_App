@@ -62,6 +62,7 @@ class Settings(BaseSettings):
             _BACKEND_ROOT / ".env",
         ),
         case_sensitive=False,
+        extra="ignore",
     )
 
 

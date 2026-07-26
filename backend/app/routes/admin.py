@@ -33,8 +33,11 @@ class Phase3RetrievalRequest(BaseModel):
 class Phase4RecommendationRequest(BaseModel):
     project_requirements: str = Field(..., min_length=10, max_length=3000)
     required_skills: list[str] = Field(default_factory=list)
+    required_certifications: list[str] = Field(default_factory=list)
     team_size: int = Field(default=3, ge=1, le=20)
     top_k: int = Field(default=10, ge=1, le=20)
+    min_experience_years: float = Field(default=0.0, ge=0.0, le=60.0)
+    max_experience_years: float | None = Field(default=None, ge=0.0, le=60.0)
 
 
 def _get_vector_store() -> VectorStoreService:
@@ -269,8 +272,11 @@ def validate_phase4_recommendations(
     return service.recommend_phase4(
         project_requirements=request.project_requirements,
         required_skills=request.required_skills,
+        required_certifications=request.required_certifications,
         team_size=request.team_size,
         top_k=request.top_k,
+        min_experience_years=request.min_experience_years,
+        max_experience_years=request.max_experience_years,
     )
 
 
