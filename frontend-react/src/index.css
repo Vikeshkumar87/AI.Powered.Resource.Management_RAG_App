@@ -497,6 +497,24 @@ body {
 
 .source-table-wrap { margin-top: 0.25rem; }
 
+.score-logic-note {
+    margin: 0 0 0.75rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-sm);
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1e3a8a;
+    font-size: 0.8rem;
+    line-height: 1.5;
+}
+
+.score-logic-note code {
+    background: rgba(30, 58, 138, 0.08);
+    border-radius: 4px;
+    padding: 0.1rem 0.35rem;
+    font-size: 0.78rem;
+}
+
 .source-table td,
 .source-table th {
     vertical-align: top;

@@ -6,22 +6,6 @@ from typing import List, Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
-
-def _clamp_score(value: float) -> float:
-    return max(0.0, min(1.0, float(value)))
-
-
-def _score_label(score: float) -> str:
-    if score >= 0.85:
-        return "Excellent match"
-    if score >= 0.70:
-        return "Strong match"
-    if score >= 0.50:
-        return "Moderate match"
-    if score >= 0.30:
-        return "Weak match"
-    return "Low match"
-
 # VectorStoreService is responsible for managing the ChromaDB vector store, 
 # which is used to perform semantic search over resources and projects. 
 # It handles adding, updating, deleting, and searching documents in the
@@ -198,14 +182,10 @@ class VectorStoreService:
             documents = []
             if results and results.get("documents"):
                 for i, doc in enumerate(results["documents"][0]):
-                    raw_score = 1.0 - (results["distances"][0][i] if results.get("distances") else 0)
-                    relevance_score = _clamp_score(raw_score)
                     documents.append({
                         "content": doc,
                         "metadata": results["metadatas"][0][i] if results.get("metadatas") else {},
-                        "score": relevance_score,
-                        "relevance_score": relevance_score,
-                        "score_label": _score_label(relevance_score),
+                        "score": 1.0 - (results["distances"][0][i] if results.get("distances") else 0),
                     })
 
             return documents
