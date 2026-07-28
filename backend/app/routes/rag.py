@@ -7,6 +7,7 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 from app.database import get_db
+from app.routes.auth import get_current_session
 from app.services.rag_service import RAGService
 # APIRouter is used to create a group of related API routes for RAG (Retrieval-Augmented Generation) queries and recommendations.
 router = APIRouter(prefix="/rag", tags=["RAG - AI Queries"])
@@ -73,6 +74,7 @@ def _get_rag_service() -> RAGService:
 def query_resources(
     request: QueryRequest,
     rag: RAGService = Depends(_get_rag_service),
+    session: dict = Depends(get_current_session),
 ):
     """
     Ask a natural language question about resources and projects.
@@ -89,6 +91,8 @@ def query_resources(
             n_context_docs=request.n_context_docs,
             filter_type=request.filter_type,
             filter_bench=request.filter_bench,
+            user_role=session.get("role", "user"),
+            username=session.get("username"),
         )
         return QueryResponse(
             question=request.question,
@@ -132,6 +136,7 @@ def semantic_search(
     type: Optional[str] = Query(None, description="Filter by 'resource' or 'project'"),
     bench_only: bool = Query(False, description="Only return bench resources"),
     rag: RAGService = Depends(_get_rag_service),
+    session: dict = Depends(get_current_session),
 ):
     """
     Perform semantic search over resources and projects.
@@ -145,6 +150,8 @@ def semantic_search(
             n_results=n,
             filter_type=type,
             filter_bench=True if bench_only else None,
+            user_role=session.get("role", "user"),
+            username=session.get("username"),
         )
         return {
             "query": q,

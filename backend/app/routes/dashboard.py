@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from sqlalchemy import func
 from typing import Dict, Any, List, Optional
+from collections import Counter
 from datetime import datetime, timedelta, UTC
 
 from app.database import get_db
@@ -148,5 +149,73 @@ def get_project_gaps(db: Session = Depends(get_db)) -> List[Dict[str, Any]]:
     gaps.sort(key=lambda x: (priority_order.get(x["priority"], 99), -x["gap"]))
 
     return gaps
+
+
+@router.get("/forecast")
+def get_resource_forecast(db: Session = Depends(get_db)) -> Dict[str, Any]:
+    """Forecast near-term staffing demand from active and planned projects."""
+    now = datetime.now(UTC).replace(tzinfo=None)
+    projects = db.query(Project).filter(Project.status.in_(["active", "planning"])).all()
+    bench_count = db.query(Resource).filter(Resource.is_on_bench == True).count()
+
+    buckets = {
+        "30_days": {"projects": 0, "open_positions": 0},
+        "60_days": {"projects": 0, "open_positions": 0},
+        "90_days": {"projects": 0, "open_positions": 0},
+    }
+    skill_counts: Counter[str] = Counter()
+    at_risk_projects: List[Dict[str, Any]] = []
+    total_open_positions = 0
+
+    for project in projects:
+        gap = max(0, project.team_size_required - project.current_team_size)
+        if gap <= 0:
+            continue
+
+        total_open_positions += gap
+        for skill in (project.required_skills or []):
+            skill_counts[skill] += gap
+
+        start_date = project.start_date
+        days_to_start = (start_date - now).days if start_date else None
+        planning_buffer = 90 if project.status == "planning" and days_to_start is None else None
+        effective_days = days_to_start if days_to_start is not None else planning_buffer
+
+        if effective_days is None:
+            effective_days = 90
+
+        if effective_days <= 30:
+            buckets["30_days"]["projects"] += 1
+            buckets["30_days"]["open_positions"] += gap
+        if effective_days <= 60:
+            buckets["60_days"]["projects"] += 1
+            buckets["60_days"]["open_positions"] += gap
+        if effective_days <= 90:
+            buckets["90_days"]["projects"] += 1
+            buckets["90_days"]["open_positions"] += gap
+
+        if effective_days <= 60:
+            at_risk_projects.append({
+                "project_code": project.project_code,
+                "project_name": project.name,
+                "priority": project.priority,
+                "days_to_start": days_to_start,
+                "gap": gap,
+            })
+
+    top_skill_demand = [
+        {"skill": skill, "demand": demand}
+        for skill, demand in skill_counts.most_common(10)
+    ]
+
+    return {
+        "as_of": now.isoformat(),
+        "bench_capacity": bench_count,
+        "forecast_open_positions": total_open_positions,
+        "coverage_status": "covered" if bench_count >= total_open_positions else "at_risk",
+        "windows": buckets,
+        "top_skill_demand": top_skill_demand,
+        "at_risk_projects": at_risk_projects,
+    }
 
 

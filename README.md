@@ -120,6 +120,68 @@ User Query
 - **Retrieval**: Cosine similarity search returns the most semantically relevant entries.
 - **Generation**: OpenAI or Ollama produces a natural language answer; demo mode formats the raw context.
 
+## Verified Implementation Notes
+
+The following items in the project description are implemented in the current codebase:
+
+- AI assistant chat for natural-language staffing and resource questions.
+- Ranked resource recommendations with match scores and explanations.
+- Bench filtering and resource availability filtering.
+- Skill gap detection and upskilling suggestions in the phase pipeline.
+- Certification-aware recommendation scoring.
+- Project-history-aware recommendation scoring.
+- Analytics dashboard metrics for total resources, bench count, bench percentage, allocations, department breakdown, and top skills.
+- Bench-aging analytics and project-gap analytics.
+- Context source retrieval with semantic scores shown in the UI.
+
+The main retrieval stack uses ChromaDB for the live RAG service, while the phase-validation pipeline writes FAISS artifacts for its own step-by-step workflow.
+
+## Presentation-Ready Summary
+
+### Problem Statement
+IT services organizations often struggle to place the right employees on the right projects because visibility into skills, certifications, availability, and project history is fragmented. That creates higher bench costs, slower staffing, manual matching effort, and weaker insight into future demand.
+
+### Proposed Solution
+This platform combines an AI assistant and analytics dashboard to support resource managers. The assistant accepts natural-language staffing requests and returns ranked employee recommendations with match scores and explanations. The dashboard shows utilization, bench status, skill demand, and project gaps so managers can make faster and better decisions.
+
+### How RAG Retrieves Documents
+1. A user submits a question or staffing request in the UI.
+2. The backend converts the query into an embedding.
+3. ChromaDB retrieves the top semantic matches from employee and project documents.
+4. Metadata filters narrow results by type, bench status, and other conditions.
+5. The retrieved documents are assembled into context for the LLM.
+6. The LLM generates the final response, while the UI shows the source list and semantic scores.
+
+### Example Output Format
+Query: Find two available Java developers with AWS experience.
+
+AI Response:
+- ✓ Employee A - 91% Match
+- ✓ Employee B - 88% Match
+
+Reasoning:
+- Skills match project requirements
+- Availability confirmed
+- Relevant project experience
+
+### Verified Features in the Codebase
+- AI-powered resource matching
+- Conversational staffing assistant
+- Bench management and availability filtering
+- Skill gap identification and upskilling suggestions
+- Certification matching
+- Project history matching
+- Resource utilization dashboard
+- Bench analytics and project-gap analytics
+- Explainable AI recommendations with context source scores
+
+### Architecture Notes
+- Live RAG service: ChromaDB + SentenceTransformer embeddings + LLM generation
+- Transactional store: SQLite + SQLAlchemy models
+- Phase validation pipeline: FAISS-based artifacts for stepwise verification
+- Frontend: React-based browser UI for AI query, recommendations, and analytics
+
+
 ---
 
 ## License

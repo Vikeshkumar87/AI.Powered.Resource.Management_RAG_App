@@ -5,26 +5,25 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [gaps, setGaps] = useState([]);
   const [aging, setAging] = useState([]);
+  const [forecast, setForecast] = useState(null);
   const [loading, setLoading] = useState(true);
   const [seedStatus, setSeedStatus] = useState('');
   const [seeding, setSeeding] = useState(false);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
-    try {
-      const [s, g, a] = await Promise.all([
-        api('/dashboard/stats'),
-        api('/dashboard/project-gaps'),
-        api('/dashboard/bench-aging'),
-      ]);
-      setStats(s);
-      setGaps(g);
-      setAging(a);
-    } catch {
-      setStats(null);
-    } finally {
-      setLoading(false);
-    }
+    const [statsRes, gapsRes, agingRes, forecastRes] = await Promise.allSettled([
+      api('/dashboard/stats'),
+      api('/dashboard/project-gaps'),
+      api('/dashboard/bench-aging'),
+      api('/dashboard/forecast'),
+    ]);
+
+    setStats(statsRes.status === 'fulfilled' ? statsRes.value : null);
+    setGaps(gapsRes.status === 'fulfilled' ? gapsRes.value : []);
+    setAging(agingRes.status === 'fulfilled' ? agingRes.value : []);
+    setForecast(forecastRes.status === 'fulfilled' ? forecastRes.value : null);
+    setLoading(false);
   }, []);
 
   useEffect(() => { loadDashboard(); }, [loadDashboard]);
@@ -76,11 +75,82 @@ export default function Dashboard() {
               <div className="stat-value">{stats.projects.active}</div>
               <div className="stat-sub">{stats.projects.planning} in planning</div>
             </div>
+            <div className="stat-card">
+              <div className="stat-label">Forecast demand</div>
+              <div className="stat-value">{forecast?.forecast_open_positions ?? 0}</div>
+              <div className="stat-sub">Open positions in next 90 days</div>
+            </div>
           </>
         ) : (
           <div className="stat-card">
             <div className="stat-value">—</div>
             <div className="stat-label">No data yet. Seed the database!</div>
+          </div>
+        )}
+      </div>
+
+      <div className="card">
+        <h3>🔮 Demand Forecast</h3>
+        {loading ? (
+          <p className="empty-state loading" style={{ padding: '1rem' }}>Loading...</p>
+        ) : forecast ? (
+          <div className="dashboard-grid forecast-grid">
+            <div className="stat-card">
+              <div className="stat-label">30 days</div>
+              <div className="stat-value">{forecast.windows?.["30_days"]?.open_positions ?? 0}</div>
+              <div className="stat-sub">Open positions</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">60 days</div>
+              <div className="stat-value">{forecast.windows?.["60_days"]?.open_positions ?? 0}</div>
+              <div className="stat-sub">Open positions</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-label">90 days</div>
+              <div className="stat-value">{forecast.windows?.["90_days"]?.open_positions ?? 0}</div>
+              <div className="stat-sub">Open positions</div>
+            </div>
+          </div>
+        ) : (
+          <p className="empty-state" style={{ padding: '1rem' }}>No forecast data available.</p>
+        )}
+
+        {forecast?.top_skill_demand?.length > 0 && (
+          <div style={{ marginTop: '1rem' }}>
+            <h4>Top skill demand</h4>
+            <div className="phase-pill-row">
+              {forecast.top_skill_demand.slice(0, 8).map(item => (
+                <span key={item.skill} className="phase-pill">
+                  {item.skill}: +{item.demand}
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {forecast?.at_risk_projects?.length > 0 && (
+          <div style={{ marginTop: '1rem' }}>
+            <h4>At-risk projects</h4>
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Project</th>
+                  <th>Days to start</th>
+                  <th>Gap</th>
+                  <th>Priority</th>
+                </tr>
+              </thead>
+              <tbody>
+                {forecast.at_risk_projects.slice(0, 6).map(item => (
+                  <tr key={item.project_code}>
+                    <td><strong>{item.project_name}</strong><br /><small>{item.project_code}</small></td>
+                    <td>{item.days_to_start ?? 'Planning'}</td>
+                    <td>{item.gap}</td>
+                    <td><span className={`priority-badge ${item.priority}`}>{item.priority}</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
       </div>

@@ -42,6 +42,37 @@ function scoreBand(score) {
   return 'Low match';
 }
 
+function getDisplaySources(sources, limit = 5) {
+  return (sources || [])
+    .filter(source => normalizeScore(source.score) >= 0.35)
+    .slice(0, limit);
+}
+
+function inferRequestedTopN(question, defaultCount = 2, maxCount = 5) {
+  const text = (question || '').toLowerCase();
+
+  // Matches patterns like: "top 1", "top1", "top 3 employees"
+  const topMatch = text.match(/\btop\s*(\d+)\b/i);
+  if (topMatch) {
+    const value = Number(topMatch[1]);
+    if (Number.isFinite(value) && value > 0) {
+      return Math.min(value, maxCount);
+    }
+  }
+
+  return defaultCount;
+}
+
+function getTopMatchSummary(sources, question) {
+  const requestedCount = inferRequestedTopN(question, 2, 5);
+  return getDisplaySources(sources)
+    .slice(0, requestedCount)
+    .map(source => {
+      const name = source.metadata?.name || 'Unknown';
+      return `✓ ${name} – ${formatScorePercent(source.score)} Match`;
+    });
+}
+
 export default function AIQuery() {
   const [question, setQuestion] = useState('');
   const [benchOnly, setBenchOnly] = useState(false);
@@ -49,6 +80,7 @@ export default function AIQuery() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const displaySources = getDisplaySources(result?.sources, 5);
 
   async function runRAGQuery() {
     if (!question.trim()) { alert('Please enter a question'); return; }
@@ -138,18 +170,27 @@ export default function AIQuery() {
 
         {result && !loading && (
           <>
+            {getTopMatchSummary(result.sources, question).length > 0 && (
+              <div className="query-result query-summary-result">
+                <strong>Query:</strong> {question.trim()}<br />
+                <strong>AI Response:</strong><br />
+                {getTopMatchSummary(result.sources, question).map(line => (
+                  <div key={line} className="query-summary-line">{line}</div>
+                ))}
+              </div>
+            )}
             <div
               className="query-result"
               dangerouslySetInnerHTML={{
                 __html: `<strong>Answer:</strong><br/><br/>${escapeHtml(result.answer).replace(/\n/g, '<br/>')}
-                  <br/><br/><small style="color:#6b7280">LLM Provider: ${result.llm_provider} · Context docs used: ${result.context_used}</small>`,
+                  <br/><br/><small style="color:#6b7280">LLM Provider: ${result.llm_provider} · Context docs used: ${displaySources.length}</small>`,
               }}
             />
-            {result.sources?.length > 0 && (
+            {displaySources.length > 0 && (
               <div className="query-sources">
-                <h4>📚 Context Sources ({result.sources.length})</h4>
+                <h4>📚 Context Sources ({displaySources.length})</h4>
                 <div className="score-logic-note">
-                  <strong>Score logic:</strong> We retrieve the top {result.context_used || result.sources.length} semantic matches (default 5).{' '}
+                  <strong>Score logic:</strong> We display up to top 5 confident semantic matches.{' '}
                   Each score is computed as <code>1 - distance</code>, then clamped to the 0-1 range and shown as a percentage.{' '}
                   Higher score means stronger semantic relevance to your question.
                 </div>
@@ -165,7 +206,7 @@ export default function AIQuery() {
                       </tr>
                     </thead>
                     <tbody>
-                      {result.sources.map((s, i) => (
+                      {displaySources.map((s, i) => (
                         <tr key={i}>
                           <td><strong>#{i + 1}</strong></td>
                           <td>

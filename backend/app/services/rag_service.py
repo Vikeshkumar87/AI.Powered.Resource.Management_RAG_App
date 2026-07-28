@@ -2,11 +2,15 @@
 RAG (Retrieval-Augmented Generation) service for intelligent resource queries.
 """
 import logging
+import re
 from typing import List, Dict, Any, Optional
 from app.services.vector_store import VectorStoreService
 from app.config import settings
 
 logger = logging.getLogger(__name__)
+
+MIN_QUERY_CONFIDENCE = 0.35
+MAX_CONTEXT_DOCS = 5
 
 
 SYSTEM_PROMPT = """You are an AI assistant for a Resource Allocation and Bench Management system.
@@ -123,6 +127,18 @@ def _demo_response(context: str, query: str) -> str:
     return "\n".join(response_parts)
 
 
+def _infer_requested_top_n(question: str, default_count: int, max_count: int = MAX_CONTEXT_DOCS) -> int:
+    """Infer top-N intent from query text like 'top 1' or 'top3'."""
+    match = re.search(r"\btop\s*(\d+)\b", (question or ""), flags=re.IGNORECASE)
+    if not match:
+        return default_count
+
+    value = int(match.group(1))
+    if value <= 0:
+        return default_count
+    return min(value, max_count)
+
+
 class RAGService:
     """
     RAG service that combines vector search with LLM generation
@@ -139,6 +155,8 @@ class RAGService:
         n_context_docs: int = 5,
         filter_type: Optional[str] = None,
         filter_bench: Optional[bool] = None,
+        user_role: str = "user",
+        username: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Process a natural language query using RAG.
@@ -152,13 +170,38 @@ class RAGService:
         Returns:
             Dict with 'answer', 'sources', and 'context_used'
         """
+        effective_n_context_docs = _infer_requested_top_n(
+            question=question,
+            default_count=n_context_docs,
+            max_count=MAX_CONTEXT_DOCS,
+        )
+
         # 1. Retrieve relevant documents from vector store
-        docs = self.vs.search(
+        retrieved_docs = self.vs.search(
             query=question,
-            n_results=n_context_docs,
+            n_results=effective_n_context_docs,
             filter_type=filter_type,
             filter_bench=filter_bench,
+            user_role=user_role,
+            username=username,
         )
+
+        docs = [
+            doc for doc in retrieved_docs
+            if float(doc.get("score", 0.0) or 0.0) >= MIN_QUERY_CONFIDENCE
+        ]
+        docs = docs[:effective_n_context_docs]
+
+        if not docs:
+            return {
+                "answer": (
+                    "No reliable matches were found for this query. "
+                    "Please rephrase your question with clearer skills, role names, or project terms."
+                ),
+                "sources": [],
+                "context_used": 0,
+                "llm_provider": self.provider,
+            }
 
         # 2. Build context from retrieved documents
         context_parts = []
@@ -183,6 +226,7 @@ class RAGService:
         required_skills: List[str],
         team_size: int = 1,
         n_candidates: int = 10,
+        username: Optional[str] = None,
     ) -> Dict[str, Any]:
         """
         Recommend resources for a project based on requirements.
@@ -209,6 +253,8 @@ class RAGService:
             n_results=n_candidates,
             filter_type="resource",
             filter_bench=True,
+            user_role="admin",
+            username=username,
         )
 
         # Also search all resources if bench doesn't have enough
@@ -217,6 +263,8 @@ class RAGService:
                 query=query,
                 n_results=n_candidates,
                 filter_type="resource",
+                user_role="admin",
+                username=username,
             )
         else:
             all_docs = bench_docs

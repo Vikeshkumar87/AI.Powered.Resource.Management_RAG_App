@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     ollama_model: str = "llama2"
 
     # Demo Authentication
+    auth_secret_key: str = "change-me-in-production"
     admin_username: str = "admin"
     admin_password: str = "admin123"
     admin_display_name: str = "Administrator"
