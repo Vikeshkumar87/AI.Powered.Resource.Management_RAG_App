@@ -46,5 +46,5 @@ def get_db():
 
 def create_tables():
     """Create all database tables."""
-    from app.models import resource, project, allocation  # noqa: F401
+    from app.models import resource, project, allocation, feedback, audit_log  # noqa: F401
     Base.metadata.create_all(bind=engine)

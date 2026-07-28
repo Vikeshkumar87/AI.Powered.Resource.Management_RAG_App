@@ -11,6 +11,10 @@
       "Kubernetes",
       "AWS"
     ],
+    "certifications": [
+      "AWS Solutions Architect",
+      "CKA"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -30,6 +34,9 @@
       "MongoDB",
       "GraphQL",
       "Docker"
+    ],
+    "certifications": [
+      "AWS Developer Associate"
     ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
@@ -52,6 +59,10 @@
       "Spark",
       "NLP"
     ],
+    "certifications": [
+      "Google Cloud Professional Data Engineer",
+      "TensorFlow Developer"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -72,6 +83,11 @@
       "AWS",
       "Azure",
       "Linux"
+    ],
+    "certifications": [
+      "AWS DevOps Professional",
+      "Azure DevOps Expert",
+      "CKA"
     ],
     "availability_percentage": 50.0,
     "utilization_percentage": 50.0,
@@ -94,6 +110,10 @@
       "Redis",
       "PostgreSQL"
     ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Java OCP"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -113,6 +133,9 @@
       "AWS SageMaker",
       "SQL",
       "Feature Engineering"
+    ],
+    "certifications": [
+      "AWS Machine Learning Specialty"
     ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
@@ -135,6 +158,9 @@
       "Jest",
       "Cypress"
     ],
+    "certifications": [
+      "Google UX Design Certificate"
+    ],
     "availability_percentage": 0.0,
     "utilization_percentage": 100.0,
     "is_on_bench": false,
@@ -156,6 +182,10 @@
       "JIRA",
       "TestRail"
     ],
+    "certifications": [
+      "ISTQB Advanced",
+      "Selenium WebDriver Expert"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -175,6 +205,9 @@
       "Redis",
       "Docker",
       "Kubernetes"
+    ],
+    "certifications": [
+      "CKA"
     ],
     "availability_percentage": 0.0,
     "utilization_percentage": 100.0,
@@ -197,6 +230,11 @@
       "Security",
       "Networking"
     ],
+    "certifications": [
+      "AWS Solutions Architect Professional",
+      "Azure Solutions Architect Expert",
+      "GCP Professional Cloud Architect"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -216,6 +254,7 @@
       "MySQL",
       "Git"
     ],
+    "certifications": [],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -235,6 +274,10 @@
       "JIRA",
       "User Research",
       "Data Analysis"
+    ],
+    "certifications": [
+      "PMP",
+      "CSPO"
     ],
     "availability_percentage": 0.0,
     "utilization_percentage": 100.0,
@@ -256,6 +299,9 @@
       "Firebase",
       "REST APIs"
     ],
+    "certifications": [
+      "Google Associate Android Developer"
+    ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,
     "is_on_bench": true,
@@ -276,6 +322,9 @@
       "Firebase",
       "Core Data"
     ],
+    "certifications": [
+      "Apple Developer Certification"
+    ],
     "availability_percentage": 0.0,
     "utilization_percentage": 100.0,
     "is_on_bench": false,
@@ -295,6 +344,11 @@
       "AWS Security",
       "Python",
       "Compliance"
+    ],
+    "certifications": [
+      "CISSP",
+      "CEH",
+      "AWS Security Specialty"
     ],
     "availability_percentage": 100.0,
     "utilization_percentage": 0.0,

@@ -53,6 +53,32 @@ class VectorStoreService:
         """Create embedding for a text string."""
         return self._embeddings.encode(text).tolist()
 
+    def _normalize_allowed_roles(self, metadata: Dict[str, Any]) -> str:
+        value = metadata.get("allowed_roles")
+        if isinstance(value, list):
+            return ",".join(str(item).strip().lower() for item in value if str(item).strip())
+        if value is None:
+            return ""
+        return str(value)
+
+    def _document_is_allowed(self, metadata: Dict[str, Any], user_role: str, username: str | None) -> bool:
+        if user_role == "admin":
+            return True
+
+        allowed_roles = {role.strip().lower() for role in self._normalize_allowed_roles(metadata).split(",") if role.strip()}
+        if allowed_roles and user_role.lower() in allowed_roles:
+            return True
+
+        owner = str(metadata.get("owner") or "").strip().lower()
+        if owner and username and owner == username.strip().lower():
+            return True
+
+        access_level = str(metadata.get("access_level") or "").strip().lower()
+        if access_level in {"public", "shared"}:
+            return True
+
+        return False
+
     def add_resource(self, resource) -> None:
         """Add a resource document to the vector store."""
         self._initialize()
@@ -74,6 +100,8 @@ class VectorStoreService:
                 "department": resource.department,
                 "is_on_bench": str(resource.is_on_bench),
                 "skills": ",".join(resource.skills) if resource.skills else "",
+                "access_level": "public",
+                "allowed_roles": "admin,user",
             }],
         )
 
@@ -112,7 +140,31 @@ class VectorStoreService:
                 "client": project.client,
                 "status": project.status,
                 "required_skills": ",".join(project.required_skills) if project.required_skills else "",
+                "access_level": "public",
+                "allowed_roles": "admin,user",
             }],
+        )
+
+    def add_document_chunk(self, document_id: str, text: str, metadata: Dict[str, Any], *, default_roles: str = "admin", owner: str | None = None) -> None:
+        """Add an arbitrary document chunk to the vector store."""
+        self._initialize()
+        if not self._initialized:
+            return
+
+        embedding = self._embed(text)
+        clean_metadata = {key: str(value) for key, value in metadata.items() if value is not None}
+        clean_metadata.setdefault("type", "document")
+        clean_metadata.setdefault("name", document_id)
+        clean_metadata.setdefault("access_level", "admin")
+        if owner:
+            clean_metadata.setdefault("owner", owner)
+        clean_metadata.setdefault("allowed_roles", default_roles)
+
+        self._collection.upsert(
+            ids=[document_id],
+            embeddings=[embedding],
+            documents=[text],
+            metadatas=[clean_metadata],
         )
 
     def update_project(self, project) -> None:
@@ -135,6 +187,8 @@ class VectorStoreService:
         n_results: int = 5,
         filter_type: Optional[str] = None,
         filter_bench: Optional[bool] = None,
+        user_role: str = "user",
+        username: str | None = None,
     ) -> List[Dict[str, Any]]:
         """
         Perform semantic search over resources and projects.
@@ -171,7 +225,7 @@ class VectorStoreService:
 
             kwargs = {
                 "query_embeddings": [query_embedding],
-                "n_results": min(n_results, self._collection.count() or 1),
+                "n_results": min(max(n_results * 2, n_results), self._collection.count() or 1),
                 "include": ["documents", "metadatas", "distances"],
             }
             if where_filter is not None:
@@ -182,11 +236,16 @@ class VectorStoreService:
             documents = []
             if results and results.get("documents"):
                 for i, doc in enumerate(results["documents"][0]):
+                    metadata = results["metadatas"][0][i] if results.get("metadatas") else {}
+                    if not self._document_is_allowed(metadata, user_role=user_role, username=username):
+                        continue
                     documents.append({
                         "content": doc,
-                        "metadata": results["metadatas"][0][i] if results.get("metadatas") else {},
+                        "metadata": metadata,
                         "score": 1.0 - (results["distances"][0][i] if results.get("distances") else 0),
                     })
+                    if len(documents) >= n_results:
+                        break
 
             return documents
 

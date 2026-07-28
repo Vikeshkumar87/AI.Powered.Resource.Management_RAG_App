@@ -50,6 +50,9 @@ function SummaryMetric({ label, value, sublabel }) {
 export default function Phases() {
   const [phase1Result, setPhase1Result] = useState(null);
   const [phase2Result, setPhase2Result] = useState(null);
+  const [documentsToIngest, setDocumentsToIngest] = useState([]);
+  const [ingestStatus, setIngestStatus] = useState('');
+  const [ingestLoading, setIngestLoading] = useState(false);
   const [phase3Request, setPhase3Request] = useState(DEFAULT_PHASE3_REQUEST);
   const [phase3TopK, setPhase3TopK] = useState(5);
   const [phase3MinAvailability, setPhase3MinAvailability] = useState(50);
@@ -103,6 +106,31 @@ export default function Phases() {
       throw e;
     } finally {
       setPhaseState('phase2', false);
+    }
+  }
+
+  async function ingestDocuments() {
+    if (!documentsToIngest.length) {
+      setIngestStatus('Please select one or more txt, md, or json files.');
+      return;
+    }
+
+    const formData = new FormData();
+    documentsToIngest.forEach(file => formData.append('files', file));
+
+    setIngestLoading(true);
+    setIngestStatus('');
+    try {
+      const result = await api('/admin/ingest-documents', {
+        method: 'POST',
+        body: formData,
+      });
+      setIngestStatus(`Indexed ${result.chunks_indexed} chunks from ${result.files_processed} file(s).`);
+      setDocumentsToIngest([]);
+    } catch (e) {
+      setIngestStatus(e.message);
+    } finally {
+      setIngestLoading(false);
     }
   }
 
@@ -260,6 +288,28 @@ export default function Phases() {
               <pre className="json-output">{formatJson(phase2Result)}</pre>
             </div>
           )}
+          <div className="phase-mini-card phase-upload-card">
+            <h3>Ingest external documents</h3>
+            <p>Upload txt, md, or json files to add searchable knowledge to the live RAG index.</p>
+            <div className="phase-upload-row">
+              <input
+                className="form-input"
+                type="file"
+                accept=".txt,.md,.json"
+                multiple
+                onChange={e => setDocumentsToIngest(Array.from(e.target.files || []))}
+              />
+              <button className="btn btn-primary" onClick={ingestDocuments} disabled={ingestLoading}>
+                {ingestLoading ? 'Indexing...' : 'Upload & index'}
+              </button>
+            </div>
+            {documentsToIngest.length > 0 && (
+              <div className="phase-status phase-status-inline">
+                {documentsToIngest.length} file(s) selected
+              </div>
+            )}
+            {ingestStatus && <div className="phase-status phase-status-inline">{ingestStatus}</div>}
+          </div>
         </PhaseCard>
 
         <PhaseCard

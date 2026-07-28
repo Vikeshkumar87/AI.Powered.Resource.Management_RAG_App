@@ -476,6 +476,17 @@ body {
     line-height: 1.8;
 }
 
+.query-summary-result {
+    background: linear-gradient(135deg, #ecfdf5 0%, #d1fae5 100%);
+    border-left-color: var(--success);
+}
+
+.query-summary-line {
+    margin-top: 0.4rem;
+    font-weight: 700;
+    color: #065f46;
+}
+
 .query-sources {
     margin-top: 1rem;
     padding: 1rem;
@@ -795,6 +806,24 @@ body {
     background: #f8fafc;
     border: 1px solid var(--gray-200);
     font-size: 0.85rem;
+}
+
+.phase-upload-card {
+    margin-top: 1rem;
+    border: 1px dashed rgba(59, 130, 246, 0.35);
+    background: linear-gradient(135deg, #f8fbff 0%, #eef6ff 100%);
+}
+
+.phase-upload-card p {
+    margin-bottom: 0.85rem;
+    color: var(--gray-600);
+}
+
+.phase-upload-row {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .phase-form-grid { display: grid; gap: 1rem; margin-bottom: 0.75rem; }

@@ -60,8 +60,12 @@ export default function App() {
   }, [session?.role]);
 
   function handleLogin(result) {
-    saveSession(result);
-    setSession(result);
+    const sessionData = {
+      ...result,
+      token: result.access_token || result.token,
+    };
+    saveSession(sessionData);
+    setSession(sessionData);
     setActiveSection(result.role === 'admin' ? 'phases' : 'dashboard');
   }
 

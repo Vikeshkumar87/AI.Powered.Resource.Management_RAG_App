@@ -167,8 +167,13 @@ Build an AI-powered system that helps organizations:
 
 ### Phase 6: RAG Foundation
 - Build ingestion pipeline (parse/chunk/embed/index)
-- Integrate vector store and metadata filtering
+- Integrate live vector store and metadata filtering
 - Implement retrieval and prompt orchestration service
+
+### Phase 6a: Phase Pipeline Validation
+- Generate FAISS artifacts for phase-based validation
+- Expose stepwise retrieval, recommendation, and dashboard outputs
+- Keep the validation pipeline separate from the live RAG store
 
 ### Phase 7: RAG Experience Integration
 - Add chat/Q&A APIs with source citations
@@ -196,6 +201,12 @@ Build an AI-powered system that helps organizations:
 - Require citations for high-impact assistant responses
 - Keep human-in-the-loop approval for final staffing decisions
 - Collect and reuse feedback for continuous improvement
+
+## 9.1) Current Implementation Status
+- Live RAG service uses ChromaDB and semantic metadata filtering.
+- Phase validation pipeline uses FAISS artifacts for step-by-step demo and browser verification.
+- Recommendation scoring currently includes semantic similarity, skill overlap, availability, experience, certification match, and project history.
+- Dashboard analytics currently cover resource totals, bench status, allocation counts, department breakdown, top skills, bench aging, and project gaps.
 
 ## 10) Key Risks and Mitigations
 - **Poor data quality** → enforce validation and profile completeness checks

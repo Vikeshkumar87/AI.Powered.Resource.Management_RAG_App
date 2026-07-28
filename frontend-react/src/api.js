@@ -9,14 +9,21 @@ export async function api(path, options = {}) {
     session = null;
   }
 
+  const isFormData = typeof FormData !== 'undefined' && options.body instanceof FormData;
+  const headers = {
+    ...(session?.token ? { Authorization: `Bearer ${session.token}` } : {}),
+    'X-User-Role': session?.role || 'user',
+    'X-User-Name': session?.username || '',
+    ...(options.headers || {}),
+  };
+
+  if (!isFormData) {
+    headers['Content-Type'] = 'application/json';
+  }
+
   const res = await fetch(`${API_BASE}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      'X-User-Role': session?.role || 'user',
-      'X-User-Name': session?.username || '',
-      ...(options.headers || {}),
-    },
     ...options,
+    headers,
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: res.statusText }));

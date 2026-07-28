@@ -1,7 +1,11 @@
 """
 Admin routes for database management, system administration, and phase validation.
 """
-from fastapi import APIRouter, Depends, HTTPException
+import json
+import re
+from pathlib import Path
+
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from sqlalchemy.orm import Session
 from typing import Dict, Any
 from pydantic import BaseModel, Field
@@ -10,6 +14,7 @@ from app.database import get_db, create_tables
 from app.models.resource import Resource
 from app.models.project import Project
 from app.models.allocation import Allocation
+from app.models.audit_log import AuditLog
 from app.data.sample_data import (
     get_sample_resources,
     get_sample_projects,
@@ -19,6 +24,7 @@ from app.data.phase1_preparation import save_phase1_json
 from app.services.vector_store import VectorStoreService
 from app.services.phase_pipeline import get_phase_pipeline_service
 from app.routes.auth import require_admin
+from app.services.audit import log_audit_event
 
 router = APIRouter(prefix="/admin", tags=["Admin"])
 
@@ -42,6 +48,42 @@ class Phase4RecommendationRequest(BaseModel):
 
 def _get_vector_store() -> VectorStoreService:
     return VectorStoreService()
+
+
+def _chunk_text(text: str, chunk_size: int = 900, overlap: int = 120) -> list[str]:
+    normalized = re.sub(r"\s+", " ", (text or "")).strip()
+    if not normalized:
+        return []
+
+    chunks = []
+    start = 0
+    while start < len(normalized):
+        end = min(len(normalized), start + chunk_size)
+        chunks.append(normalized[start:end].strip())
+        if end >= len(normalized):
+            break
+        start = max(0, end - overlap)
+    return chunks
+
+
+def _extract_file_text(file_name: str, content: bytes) -> str:
+    suffix = Path(file_name or "").suffix.lower()
+    raw_text = content.decode("utf-8", errors="ignore")
+
+    if suffix in {".txt", ".md", ".markdown"}:
+        return raw_text
+
+    if suffix == ".json":
+        try:
+            parsed = json.loads(raw_text)
+            return json.dumps(parsed, indent=2, ensure_ascii=False)
+        except Exception:
+            return raw_text
+
+    raise HTTPException(
+        status_code=400,
+        detail=f"Unsupported file type: {suffix or 'unknown'}. Use txt, md, or json.",
+    )
 
 
 @router.post("/seed", summary="Seed database with sample data")
@@ -123,6 +165,20 @@ def seed_database(
     except Exception as e:
         pass  # Vector store indexing is non-critical
 
+    log_audit_event(
+        action="seed_database",
+        entity_type="database",
+        details={
+            "clear_existing": clear_existing,
+            "resources_created": resources_created,
+            "projects_created": projects_created,
+            "allocations_created": allocations_created,
+            "vector_store_indexed": indexed_count,
+        },
+        source="admin.seed",
+        db=db,
+    )
+
     return {
         "status": "success",
         "resources_created": resources_created,
@@ -145,6 +201,13 @@ def reindex_vector_store(
 
     try:
         indexed_count = vs.rebuild_index(all_resources, all_projects)
+        log_audit_event(
+            action="reindex_vector_store",
+            entity_type="vector_store",
+            details={"resources": len(all_resources), "projects": len(all_projects), "indexed": indexed_count},
+            source="admin.reindex",
+            db=db,
+        )
         return {
             "status": "success",
             "indexed": indexed_count,
@@ -153,6 +216,98 @@ def reindex_vector_store(
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Reindexing failed: {str(e)}")
+
+
+@router.post("/ingest-documents", summary="Upload and index knowledge documents")
+async def ingest_documents(
+    files: list[UploadFile] = File(...),
+    db: Session = Depends(get_db),
+    vs: VectorStoreService = Depends(_get_vector_store),
+    _role: str = Depends(require_admin),
+) -> Dict[str, Any]:
+    if not files:
+        raise HTTPException(status_code=400, detail="At least one file must be uploaded.")
+
+    ingested_files = 0
+    ingested_chunks = 0
+    indexed_documents = []
+
+    for upload in files:
+        content = await upload.read()
+        text = _extract_file_text(upload.filename or "document.txt", content)
+        chunks = _chunk_text(text)
+        if not chunks:
+            continue
+
+        ingested_files += 1
+        for chunk_index, chunk in enumerate(chunks, start=1):
+            document_id = f"doc_{Path(upload.filename or 'document').stem}_{chunk_index}"
+            metadata = {
+                "type": "document",
+                "name": Path(upload.filename or "document").stem,
+                "source_file": upload.filename or "document",
+                "chunk_index": chunk_index,
+                "chunk_count": len(chunks),
+                "mime_type": upload.content_type or "application/octet-stream",
+            }
+            vs.add_document_chunk(document_id=document_id, text=chunk, metadata=metadata, default_roles="admin")
+            ingested_chunks += 1
+            indexed_documents.append({
+                "document_id": document_id,
+                "source_file": upload.filename or "document",
+                "chunk_index": chunk_index,
+            })
+
+    log_audit_event(
+        action="ingest_documents",
+        entity_type="document",
+        details={
+            "files_processed": ingested_files,
+            "chunks_indexed": ingested_chunks,
+            "documents": indexed_documents[:20],
+        },
+        source="admin.ingest-documents",
+        db=db,
+    )
+
+    return {
+        "status": "success",
+        "files_processed": ingested_files,
+        "chunks_indexed": ingested_chunks,
+        "documents": indexed_documents,
+        "message": "Uploaded documents were parsed, chunked, and indexed for RAG retrieval.",
+    }
+
+
+@router.get("/audit-logs", summary="List audit logs")
+def list_audit_logs(
+    limit: int = 50,
+    db: Session = Depends(get_db),
+    _role: str = Depends(require_admin),
+) -> Dict[str, Any]:
+    rows = (
+        db.query(AuditLog)
+        .order_by(AuditLog.created_at.desc(), AuditLog.id.desc())
+        .limit(max(1, min(limit, 200)))
+        .all()
+    )
+    return {
+        "total": db.query(AuditLog).count(),
+        "entries": [
+            {
+                "id": row.id,
+                "action": row.action,
+                "entity_type": row.entity_type,
+                "entity_id": row.entity_id,
+                "details": row.details,
+                "actor": row.actor,
+                "actor_role": row.actor_role,
+                "source": row.source,
+                "created_at": row.created_at.isoformat() if row.created_at else None,
+            }
+            for row in rows
+        ],
+    }
 
 
 @router.delete("/clear", summary="Clear all data")
